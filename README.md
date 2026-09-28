@@ -4,7 +4,16 @@
 N1000, N2000 og N5000. Pakken distribuerer ingen kartdata. Originalfilene
 lastes direkte fra Kartverket/Geonorge og caches lokalt hos brukeren.
 
-Installer kildepakken med `R CMD INSTALL .` når `sf`, `httr2` og `xml2` er installert.
+Pakken er tilgjengelig på [GitHub](https://github.com/hmalmedal/kartdata)
+og kan installeres direkte derfra:
+
+```r
+install.packages("remotes")  # nødvendig bare hvis remotes ikke er installert
+remotes::install_github("hmalmedal/kartdata")
+```
+
+Fra en lokal kopi av repositoriet kan du også installere kildepakken med
+`R CMD INSTALL .` når `sf`, `httr2` og `xml2` er installert.
 
 ```r
 library(kartdata)
