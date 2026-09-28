@@ -1,10 +1,16 @@
 Package: kartdata
-Title: What the Package Does (One Line, Title Case)
+Title: Client for Norwegian Mapping Authority Topographic Data
 Version: 0.0.0.9000
 Authors@R: 
     person("Håkon", "Malmedal", , "hmalmedal@gmail.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Description: Discover and download topographic N-series data directly from
+    Geonorge using official ATOM feeds. Cache original archives locally and
+    read individual spatial layers with 'sf'. No map data are distributed.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 8.0.0
+Depends: R (>= 4.1.0)
+Imports: sf, httr2, xml2
+Suggests: testthat (>= 3.2.0), roxygen2, zip
+Config/testthat/edition: 3
