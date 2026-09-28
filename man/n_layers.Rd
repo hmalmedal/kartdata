@@ -21,7 +21,8 @@ n_get(
   epsg = 25833,
   format = c("auto", "FGDB", "GML"),
   refresh = c("never", "check", "force"),
-  cache_dir = tools::R_user_dir("kartdata", "cache")
+  cache_dir = tools::R_user_dir("kartdata", "cache"),
+  memory_cache = TRUE
 )
 }
 \arguments{
@@ -44,6 +45,9 @@ A missing cache is downloaded in every mode.}
 \item{cache_dir}{Cache root; defaults to \code{tools::R_user_dir("kartdata", "cache")}.}
 
 \item{layer}{Exact layer name returned by \code{n_layers()}.}
+
+\item{memory_cache}{If TRUE (default), reuse and retain the layer and its
+index in session memory. FALSE bypasses both for this call.}
 }
 \value{
 \code{n_layers()} returns a character vector; \code{n_get()} an \code{sf} object.
@@ -53,6 +57,11 @@ Original archives are cached outside the project. The first call downloads
 the selected archive (potentially large for detailed series). Only the
 requested layer is loaded as an sf object. Original names, attributes, dates,
 identifiers and coordinate reference system are preserved as read by GDAL.
+Layer indexes and loaded objects are reused in this R session, with a shared
+approximate 128 MiB LRU limit. Set \code{options(kartdata.memory_cache_size = 0)}
+to disable all memory caching, or supply another limit in bytes. Objects
+larger than the limit are returned without being retained. Updating or
+clearing the disk cache invalidates its memory entries.
 }
 \examples{
 \dontrun{

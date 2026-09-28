@@ -14,7 +14,8 @@ n_cache_info(
 
 n_cache_clear(
   series = NULL,
-  cache_dir = tools::R_user_dir("kartdata", "cache")
+  cache_dir = tools::R_user_dir("kartdata", "cache"),
+  memory_only = FALSE
 )
 }
 \arguments{
@@ -27,10 +28,15 @@ the current ATOM entry. Does not download map data. Network failures error.}
 
 \item{verify}{If TRUE, also verify the original ZIP checksum. Otherwise
 check the presence and sizes of the ZIP and extracted files.}
+
+\item{memory_only}{If TRUE, clear only the selected session memory entries;
+retain downloaded files. Default FALSE clears both memory and disk.}
 }
 \value{
 \code{n_cache_info()} returns a data frame with paths, version metadata,
 sizes, integrity status and (when checked) whether updates are available.
+\code{memory_bytes} counts approximate retained object sizes (including the
+layer index); \code{cached_layers} counts retained sf layers in this R session.
 \code{n_cache_clear()} invisibly returns the removed cache paths.
 }
 \description{

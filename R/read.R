@@ -49,6 +49,11 @@ layer_index <- function(directory, format) {
 #' the selected archive (potentially large for detailed series). Only the
 #' requested layer is loaded as an sf object. Original names, attributes, dates,
 #' identifiers and coordinate reference system are preserved as read by GDAL.
+#' Layer indexes and loaded objects are reused in this R session, with a shared
+#' approximate 128 MiB LRU limit. Set `options(kartdata.memory_cache_size = 0)`
+#' to disable all memory caching, or supply another limit in bytes. Objects
+#' larger than the limit are returned without being retained. Updating or
+#' clearing the disk cache invalidates its memory entries.
 #'
 #' @param series N-series, such as `"N1000"` or `1000`.
 #' @param area Character area code; `"0000"` selects nationwide data.
@@ -63,6 +68,8 @@ layer_index <- function(directory, format) {
 #'   A missing cache is downloaded in every mode.
 #' @param cache_dir Cache root; defaults to `tools::R_user_dir("kartdata", "cache")`.
 #' @param layer Exact layer name returned by `n_layers()`.
+#' @param memory_cache If TRUE (default), reuse and retain the layer and its
+#'   index in session memory. FALSE bypasses both for this call.
 #' @return `n_layers()` returns a character vector; `n_get()` an `sf` object.
 #' @export
 #' @examples
@@ -77,7 +84,7 @@ n_layers <- function(series = "N1000", area = "0000", epsg = 25833,
                      cache_dir = tools::R_user_dir("kartdata", "cache")) {
   sel <- selection(series, area, epsg, match.arg(format))
   cached <- ensure_cache(sel, match.arg(refresh), cache_dir)
-  sort(unique(layer_index(file.path(cached$path, "files"), cached$format)$layer))
+  sort(unique(cached_layer_index(cached)$layer))
 }
 
 #' @rdname n_layers
@@ -85,11 +92,18 @@ n_layers <- function(series = "N1000", area = "0000", epsg = 25833,
 n_get <- function(layer, series = "N1000", area = "0000", epsg = 25833,
                   format = c("auto", "FGDB", "GML"),
                   refresh = c("never", "check", "force"),
-                  cache_dir = tools::R_user_dir("kartdata", "cache")) {
+                  cache_dir = tools::R_user_dir("kartdata", "cache"),
+                  memory_cache = TRUE) {
   scalar_text(layer, "layer")
+  if (!is.logical(memory_cache) || length(memory_cache) != 1L || is.na(memory_cache))
+    abort("memory_cache must be TRUE or FALSE.")
   sel <- selection(series, area, epsg, match.arg(format))
   cached <- ensure_cache(sel, match.arg(refresh), cache_dir)
-  layers <- layer_index(file.path(cached$path, "files"), cached$format)
+  memory_fetch(cached, "layer", layer, function() read_layer(layer, cached, memory_cache), memory_cache)
+}
+
+read_layer <- function(layer, cached, memory_cache) {
+  layers <- cached_layer_index(cached, enabled = memory_cache)
   chosen <- layers[layers$layer == layer, , drop = FALSE]
   if (!nrow(chosen)) abort("Unknown layer '", layer, "'. Available layers: ",
                             paste(sort(unique(layers$layer)), collapse = ", "))

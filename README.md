@@ -61,6 +61,32 @@ n_cache_clear("N1000")               # fjern bare denne serien
 n_cache_clear()                      # fjern alle kartdata-cacheoppføringer
 ```
 
+Lagoversikten og ferdig innleste `sf`-objekter caches også i minnet i samme
+R-økt. Gjentatte kall til `n_get()` slipper dermed både lagoppdagelse og
+innlesing via GDAL. Originalfilene kontrolleres fortsatt, og `refresh = "check"`
+sjekker fortsatt Geonorge før gjenbruk. Oppdatering av diskcachen ugyldiggjør
+tilhørende minnecache, også ved `refresh = "force"`.
+
+```r
+system.time(veg <- n_get("Veglenke", 1000))
+system.time(veg <- n_get("Veglenke", 1000))  # gjenbruk fra minnet
+n_cache_info()                              # memory_bytes og cached_layers
+n_cache_clear("N1000", memory_only = TRUE)  # behold nedlastede filer
+
+# Valgfri justering av samlet minnegrense (standard: 128 MiB)
+options(kartdata.memory_cache_size = 256 * 1024^2)
+veg <- n_get("Veglenke", 1000, memory_cache = FALSE)  # omgå minnecache
+options(kartdata.memory_cache_size = 0)               # deaktiver minnecache
+```
+
+Minnegrensen gjelder omtrentlige objektstørrelser; samlet RAM-bruk kan være
+høyere under innlesing. Minst nylig brukte oppføringer fjernes først. Et lag
+større enn grensen returneres uten å beholdes i minnecachen. En endret grense
+håndheves ved neste cachekall. Minnecachen forsvinner når R avsluttes; første
+innlesing i en ny økt bruker originalfilene igjen. Det lagres ingen innleste
+kartobjekter på disk. `n_cache_clear()` tømmer både disk- og minnecache for
+valgte serier.
+
 Standardplasseringen er `tools::R_user_dir("kartdata", "cache")`, utenfor
 prosjektet og Git. Original ZIP, utpakkede originalfiler og små tekstbaserte
 cachemetadata beholdes. Ingen kartdata konverteres til RDA, RDS eller Parquet.

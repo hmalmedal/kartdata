@@ -97,6 +97,7 @@ ensure_cache <- function(sel, refresh, cache_dir) {
     if (had_old) file.rename(backup, target)
     abort("Cannot publish downloaded cache at ", target)
   }
+  memory_forget(target)
   if (had_old) unlink(backup, recursive = TRUE)
   list(path = target, format = remote$format)
 }
@@ -119,8 +120,12 @@ cache_paths <- function(cache_dir, series = NULL) {
 #'   the current ATOM entry. Does not download map data. Network failures error.
 #' @param verify If TRUE, also verify the original ZIP checksum. Otherwise
 #'   check the presence and sizes of the ZIP and extracted files.
+#' @param memory_only If TRUE, clear only the selected session memory entries;
+#'   retain downloaded files. Default FALSE clears both memory and disk.
 #' @return `n_cache_info()` returns a data frame with paths, version metadata,
 #'   sizes, integrity status and (when checked) whether updates are available.
+#'   `memory_bytes` counts approximate retained object sizes (including the
+#'   layer index); `cached_layers` counts retained sf layers in this R session.
 #'   `n_cache_clear()` invisibly returns the removed cache paths.
 #' @export
 #' @examples
@@ -137,7 +142,8 @@ n_cache_info <- function(series = NULL, cache_dir = tools::R_user_dir("kartdata"
   paths <- cache_paths(cache_dir, series)
   empty <- data.frame(series = character(), area = character(), epsg = integer(),
                       format = character(), updated = character(), downloaded = character(),
-                      bytes = numeric(), valid = logical(), update_available = logical(), path = character())
+                      bytes = numeric(), valid = logical(), update_available = logical(), path = character(),
+                      memory_bytes = numeric(), cached_layers = integer())
   if (!length(paths)) return(empty)
   rows <- lapply(paths, function(path) {
     parts <- strsplit(basename(path), "_", fixed = TRUE)[[1]]
@@ -147,19 +153,26 @@ n_cache_info <- function(series = NULL, cache_dir = tools::R_user_dir("kartdata"
       remote <- discover(selection(parts[1], parts[2], as.numeric(parts[3]), parts[4]))
       current <- !identical(meta$updated, remote$updated) || !identical(meta$url, remote$url)
     }
+    memory <- memory_info(path)
     data.frame(series = parts[1], area = parts[2], epsg = as.integer(parts[3]), format = parts[4],
                updated = if (is.null(meta)) NA_character_ else meta$updated,
                downloaded = if (is.null(meta)) NA_character_ else meta$downloaded,
                bytes = sum(file.info(list.files(path, recursive = TRUE, full.names = TRUE))$size),
-               valid = cache_valid(path, verify), update_available = current, path = path)
+               valid = cache_valid(path, verify), update_available = current, path = path,
+               memory_bytes = unname(memory["memory_bytes"]), cached_layers = as.integer(memory["cached_layers"]))
   })
   do.call(rbind, rows)
 }
 
 #' @rdname n_cache_info
 #' @export
-n_cache_clear <- function(series = NULL, cache_dir = tools::R_user_dir("kartdata", "cache")) {
+n_cache_clear <- function(series = NULL, cache_dir = tools::R_user_dir("kartdata", "cache"),
+                          memory_only = FALSE) {
   if (!is.null(series)) series <- series_name(series)
+  if (!is.logical(memory_only) || length(memory_only) != 1L || is.na(memory_only))
+    abort("memory_only must be TRUE or FALSE.")
+  memory_clear(cache_dir, series)
+  if (memory_only) return(invisible(character()))
   paths <- cache_paths(cache_dir, series)
   root <- normalizePath(cache_root(cache_dir), winslash = "/", mustWork = FALSE)
   for (path in paths) {

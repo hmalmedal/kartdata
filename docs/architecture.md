@@ -106,6 +106,27 @@ skjemaer mellom GML og FGDB. Begge ga 14 467 Veglenke-objekter i live-testen.
 - `cache.R`: cache per serie/område/EPSG/format, original ZIP, utpakking,
   DCF-metadata, tekstlig filinventar, sjekk og tømming.
 - `read.R`: lagoppdagelse og selektiv lesing av originaldata.
+- `memory.R`: begrenset minnecache for lagindekser og innleste sf-objekter.
+
+Gjentatt innlesing caches i samme R-økt. I målingen av allerede nedlastet
+N1000 brukte lagoppdagelsen omtrent 1,9 sekunder av 2,8 sekunder for `n_get`.
+Både indeks og sf-resultat gjenbrukes derfor, innenfor en delt standardgrense
+på 128 MiB målt med `object.size`. Minst nylig brukte oppføring fjernes først;
+objekter over grensen beholdes ikke. Dette begrenser beholdt cache, ikke total
+RAM under lesing eller objekter brukeren selv har referanser til.
+Cacheidentiteten inkluderer absolutt kildebane, metadata og filstatistikk for
+arkiv og manifest. Vellykket erstatning av diskcachen fjerner alltid tilsvarende
+minneoppføringer, selv ved force med identiske data. Eksisterende validering av
+originalfiler og eksplisitte nettverkssjekker utføres før minnecacheoppslag.
+Ingen avledede kartfiler lagres på disk. En vedvarende innlesingscache er utsatt:
+den ville gi mer diskbruk og kreve versjonering av serialiserte sf-objekter.
+Brukeren kan omgå minnecachen per `n_get`-kall, endre minnegrensen eller tømme
+bare minnecachen. Første kall i en ny R-økt må fortsatt lese fra originalfilene.
+Etter implementasjon tok gjentatt `n_get("Veglenke", 1000)` omtrent 0,15 sekunder
+med minnecache mot 2,83 sekunder med `memory_cache = FALSE` på testmaskinen.
+Første kall i prosessen tok 3,45 sekunder. Resultatene var identiske, og laget
+med indeks opptok omtrent 13,5 MB i minnecachen. Tallene er enkeltmålinger,
+ikke garantier for andre maskiner eller datasett.
 
 Avhengigheter i kjøretid: sf, httr2 og xml2. Base R brukes til øvrig arbeid.
 Cacheoppdatering bygges i egen midlertidig mappe. ZIP-medlemsstier valideres
