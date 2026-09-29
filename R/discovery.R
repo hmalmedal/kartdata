@@ -15,6 +15,7 @@ http_get <- function(url, path = NULL) {
   request <- httr2::req_user_agent(request, "kartdata R client")
   request <- httr2::req_timeout(request, if (is.null(path)) 60 else 1800)
   request <- httr2::req_retry(request, max_tries = 3)
+  if (!is.null(path) && progress_enabled()) request <- httr2::req_progress(request, type = "down")
   tryCatch(httr2::req_perform(request, path = path), error = function(e)
     abort("Could not retrieve data from Geonorge. Check the network and service availability. ",
           conditionMessage(e)))
@@ -83,6 +84,7 @@ readable_formats <- function() {
 }
 
 discover <- function(sel) {
+  progress_message("Checking Geonorge files for ", sel$series, "...")
   formats <- readable_formats()
   if (sel$format != "auto") formats <- intersect(sel$format, formats)
   if (!length(formats)) abort("Local GDAL cannot read the requested format. Install sf with OpenFileGDB or GML support.")

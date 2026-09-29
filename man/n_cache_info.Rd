@@ -40,7 +40,8 @@ layer index); \code{cached_layers} counts retained sf layers in this R session.
 \code{n_cache_clear()} invisibly returns the removed cache paths.
 }
 \description{
-Inspect or clear the local map cache
+Progress messages for network checks and checksum verification follow
+\code{options(kartdata.progress)}, defaulting to \code{interactive()}.
 }
 \examples{
 n_cache_info()

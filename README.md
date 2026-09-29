@@ -51,6 +51,21 @@ Se [analyse og begrunnelse](docs/architecture.md).
 
 ## Cache og oppdatering
 
+I interaktive R-økter vises framdrift under nedlasting og FGDB-lagoppdagelse.
+Telleren ved lagoppdagelse viser andelen ferdig undersøkte fysiske lag, ikke
+andelen brukt tid. Utpakking, sjekksumberegning og innlesing viser hvilken
+operasjon som pågår. GDAL gir ikke prosentframdrift for selve innlesingen;
+etter vellykket lesing vises antall objekter. Raske minnecachetreff er stille.
+
+```r
+options(kartdata.progress = FALSE)  # slå av framdriftsvisning
+options(kartdata.progress = TRUE)   # slå på, også i skript
+options(kartdata.progress = NULL)   # standard: bare interaktivt
+```
+
+Skript og vanlige tester er stille som standard. Feil og advarsler vises
+uavhengig av denne innstillingen.
+
 ```r
 n_cache_info()                       # innhold, diskbruk og integritet
 n_cache_info(check = TRUE)           # sjekk versjoner via ATOM, ingen kartnedlasting

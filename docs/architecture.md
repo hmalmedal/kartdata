@@ -107,6 +107,16 @@ skjemaer mellom GML og FGDB. Begge ga 14 467 Veglenke-objekter i live-testen.
   DCF-metadata, tekstlig filinventar, sjekk og tømming.
 - `read.R`: lagoppdagelse og selektiv lesing av originaldata.
 - `memory.R`: begrenset minnecache for lagindekser og innleste sf-objekter.
+- `progress.R`: valgfri interaktiv framdrift uten nye avhengigheter.
+
+Framdrift aktiveres med `options(kartdata.progress = TRUE)` og er ellers på
+bare i interaktive økter. httr2 håndterer nedlastingsindikatoren; metadata-
+oppslag viser kun en statusmelding. FGDB-lagoppdagelse teller ferdig undersøkte
+fysiske lag med base Rs tekstindikator, som lukkes også ved feil. Lag har ulik
+størrelse, så telleren er ikke et tidsestimat. Utpakking, sjekksum og GDAL-lesing
+er blokkerende operasjoner uten prosentindikator; de viser operasjonsnavn.
+Et vellykket lesekall viser antall objekter. Minnecachetreff omgår disse
+meldingene sammen med arbeidet. Deaktivering påvirker ikke feil og advarsler.
 
 Gjentatt innlesing caches i samme R-økt. I målingen av allerede nedlastet
 N1000 brukte lagoppdagelsen omtrent 1,9 sekunder av 2,8 sekunder for `n_get`.

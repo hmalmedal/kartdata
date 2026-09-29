@@ -62,6 +62,11 @@ approximate 128 MiB LRU limit. Set \code{options(kartdata.memory_cache_size = 0)
 to disable all memory caching, or supply another limit in bytes. Objects
 larger than the limit are returned without being retained. Updating or
 clearing the disk cache invalidates its memory entries.
+Progress is shown by default in interactive R sessions. Set
+\code{options(kartdata.progress = FALSE)} to silence it, or TRUE to enable it
+in scripts. Downloads and FGDB layer discovery show progress indicators;
+unpacking and GDAL reads show stage messages without estimated percentages.
+Memory cache hits produce no read or layer discovery messages.
 }
 \examples{
 \dontrun{

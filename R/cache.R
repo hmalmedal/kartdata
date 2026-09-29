@@ -28,7 +28,10 @@ cache_valid <- function(path, verify = FALSE) {
   if (any(!safe_members(inventory$name))) return(FALSE)
   sizes <- file.info(file.path(path, "files", inventory$name))$size
   if (anyNA(sizes) || !identical(as.numeric(sizes), as.numeric(inventory$size))) return(FALSE)
-  if (verify && !identical(unname(tools::md5sum(archive)), meta$md5)) return(FALSE)
+  if (verify) {
+    progress_message("Verifying archive checksum for ", meta$series, " (", meta$format, ")...")
+    if (!identical(unname(tools::md5sum(archive)), meta$md5)) return(FALSE)
+  }
   TRUE
 }
 
@@ -38,6 +41,7 @@ safe_members <- function(names) {
 }
 
 unpack_archive <- function(archive, directory) {
+  progress_message("Unpacking Geonorge archive...")
   listing <- tryCatch(utils::unzip(archive, list = TRUE), error = function(e)
     abort("Corrupt or incomplete Geonorge ZIP: ", conditionMessage(e)))
   if (!nrow(listing) || any(!safe_members(listing$Name))) abort("Invalid or unsafe Geonorge ZIP archive.")
@@ -80,10 +84,11 @@ ensure_cache <- function(sel, refresh, cache_dir) {
   dir.create(stage)
   on.exit(unlink(stage, recursive = TRUE), add = TRUE)
   archive <- file.path(stage, "original.zip")
-  message("Downloading ", remote$series, " (", remote$format, ", area ", remote$area, ") from Geonorge...")
+  progress_message("Downloading ", remote$series, " (", remote$format, ", area ", remote$area, ") from Geonorge...")
   http_get(remote$url, path = archive)
   inventory <- unpack_archive(archive, file.path(stage, "files"))
   source_layers(file.path(stage, "files"), remote$format)
+  progress_message("Calculating archive checksum and saving cache...")
   meta <- c(remote, list(downloaded = format(Sys.time(), tz = "UTC", usetz = TRUE),
                          bytes = as.character(file.info(archive)$size),
                          md5 = unname(tools::md5sum(archive))))
@@ -99,6 +104,7 @@ ensure_cache <- function(sel, refresh, cache_dir) {
   }
   memory_forget(target)
   if (had_old) unlink(backup, recursive = TRUE)
+  progress_message("Download cache ready for ", remote$series, ".")
   list(path = target, format = remote$format)
 }
 
@@ -113,6 +119,9 @@ cache_paths <- function(cache_dir, series = NULL) {
 }
 
 #' Inspect or clear the local map cache
+#'
+#' Progress messages for network checks and checksum verification follow
+#' `options(kartdata.progress)`, defaulting to `interactive()`.
 #'
 #' @param series Optional series filter; `NULL` selects all series.
 #' @param cache_dir Cache root; defaults to the standard R user cache.

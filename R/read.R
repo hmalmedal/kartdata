@@ -6,6 +6,7 @@ source_layers <- function(directory, format) {
     list.files(directory, "[.]gml$", recursive = TRUE, full.names = TRUE, ignore.case = TRUE)
   }
   if (!length(sources)) abort("Incomplete cache: no ", format, " data source found. Use refresh = 'force'.")
+  progress_message("Listing layers in ", length(sources), " ", format, " data source(s)...")
   rows <- lapply(sources, function(source) {
     layers <- tryCatch(sf::st_layers(source, do_count = FALSE), error = function(e)
       abort("GDAL cannot list layers; cache may be corrupt or the driver unsupported. ", conditionMessage(e)))
@@ -24,6 +25,8 @@ layer_index <- function(directory, format) {
   physical$physical <- physical$layer
   physical$filter <- NA_character_
   if (format != "FGDB") return(physical)
+  progress <- progress_counter(nrow(physical), "Discovering FGDB object types (completed physical layers):")
+  on.exit(progress$close(), add = TRUE)
   # FGDB groups object types by theme and geometry. Ask GDAL for attributes
   # only, then let GDAL filter the one requested object type during the read.
   logical <- lapply(seq_len(nrow(physical)), function(i) {
@@ -34,6 +37,7 @@ layer_index <- function(directory, format) {
     if (!"objtype" %in% names(types)) abort("FGDB schema has changed: missing objtype. Try format = 'GML'.")
     values <- unique(as.character(types$objtype))
     values <- values[!is.na(values) & nzchar(values)]
+    progress$update(i)
     if (!length(values)) return(NULL)
     data.frame(layer = values, source = row$source, physical = row$physical, filter = values)
   })
@@ -54,6 +58,11 @@ layer_index <- function(directory, format) {
 #' to disable all memory caching, or supply another limit in bytes. Objects
 #' larger than the limit are returned without being retained. Updating or
 #' clearing the disk cache invalidates its memory entries.
+#' Progress is shown by default in interactive R sessions. Set
+#' `options(kartdata.progress = FALSE)` to silence it, or TRUE to enable it
+#' in scripts. Downloads and FGDB layer discovery show progress indicators;
+#' unpacking and GDAL reads show stage messages without estimated percentages.
+#' Memory cache hits produce no read or layer discovery messages.
 #'
 #' @param series N-series, such as `"N1000"` or `1000`.
 #' @param area Character area code; `"0000"` selects nationwide data.
@@ -111,7 +120,10 @@ read_layer <- function(layer, cached, memory_cache) {
                               ". Choose a physical layer: ", paste(unique(chosen$physical), collapse = ", "))
   query <- if (!is.na(chosen$filter)) paste0("SELECT * FROM ", sql_identifier(chosen$physical),
                                             " WHERE objtype = ", sql_string(chosen$filter)) else NULL
-  tryCatch(if (is.null(query)) sf::st_read(chosen$source, layer = chosen$physical, quiet = TRUE)
+  progress_message("Reading layer '", layer, "' (", cached$format, ")...")
+  result <- tryCatch(if (is.null(query)) sf::st_read(chosen$source, layer = chosen$physical, quiet = TRUE)
            else sf::st_read(chosen$source, query = query, quiet = TRUE), error = function(e)
     abort("GDAL could not read layer '", layer, "'. Try refresh = 'force' or format = 'GML'. ", conditionMessage(e)))
+  progress_message("Read ", nrow(result), " features from '", layer, "'.")
+  result
 }
