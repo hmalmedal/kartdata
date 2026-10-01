@@ -1,0 +1,8 @@
+pandoc: 3.8.3
+pkgdown: 2.2.1
+pkgdown_sha: ~
+articles: {}
+last_built: 2026-10-01T14:56Z
+urls:
+  reference: https://hmalmedal.github.io/kartdata/reference
+  article: https://hmalmedal.github.io/kartdata/articles
