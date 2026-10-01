@@ -12,3 +12,4 @@
 *.gpkg
 *.tar.gz
 *.Rcheck/
+docs

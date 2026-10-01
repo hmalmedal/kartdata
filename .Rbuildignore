@@ -4,3 +4,6 @@
 ^docs$
 ^.*\.tar\.gz$
 ^.*\.Rcheck$
+^_pkgdown\.yml$
+^pkgdown$
+^\.github$
