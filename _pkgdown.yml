@@ -1,4 +1,4 @@
 url: https://hmalmedal.github.io/kartdata/
+destination: _site
 template:
   bootstrap: 5
-

@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^docs$
+^_site$
 ^.*\.tar\.gz$
 ^.*\.Rcheck$
 ^_pkgdown\.yml$
