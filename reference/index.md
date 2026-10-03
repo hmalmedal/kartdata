@@ -2,6 +2,8 @@
 
 ## All functions
 
+- [`n_areas()`](https://hmalmedal.github.io/kartdata/reference/n_areas.md)
+  : Find available download areas
 - [`n_cache_info()`](https://hmalmedal.github.io/kartdata/reference/n_cache_info.md)
   [`n_cache_clear()`](https://hmalmedal.github.io/kartdata/reference/n_cache_info.md)
   : Inspect or clear the local map cache

@@ -107,7 +107,11 @@ Memory cache hits produce no read or layer discovery messages.</p>
 
 
 <dt id="arg-area">area<a class="anchor" aria-label="anchor" href="#arg-area"></a></dt>
-<dd><p>Character area code; <code>"0000"</code> selects nationwide data.</p></dd>
+<dd><p>Area name (e.g. <code>"Oslo"</code>), character code (<code>"03"</code>), or numeric
+code (<code>3</code>). <code>"Norge"</code>, <code>"landsdekkende"</code>, <code>0</code> and <code>"0000"</code> select Norway.
+Names ignore case and surrounding spaces but must match unambiguously.
+See <code><a href="n_areas.html">n_areas()</a></code> for published areas. Name lookup uses a local metadata
+table; <code>refresh = "check"</code> or <code>"force"</code> also updates that table.</p></dd>
 
 
 <dt id="arg-epsg">epsg<a class="anchor" aria-label="anchor" href="#arg-epsg"></a></dt>

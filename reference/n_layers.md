@@ -48,7 +48,13 @@ n_get(
 
 - area:
 
-  Character area code; `"0000"` selects nationwide data.
+  Area name (e.g. `"Oslo"`), character code (`"03"`), or numeric code
+  (`3`). `"Norge"`, `"landsdekkende"`, `0` and `"0000"` select Norway.
+  Names ignore case and surrounding spaces but must match unambiguously.
+  See
+  [`n_areas()`](https://hmalmedal.github.io/kartdata/reference/n_areas.md)
+  for published areas. Name lookup uses a local metadata table;
+  `refresh = "check"` or `"force"` also updates that table.
 
 - epsg:
 

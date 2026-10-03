@@ -32,11 +32,44 @@ Første kall laster ned og pakker ut arkivet. Standardvalget er
 landsdekkende data i EPSG:25833. Særlig N50 kan kreve betydelig
 diskplass og nedlastingstid. Bare det valgte laget leses til et
 `sf`-objekt. Velg eventuelt et mindre publisert område, for eksempel
-`area = "03", epsg = 25832` for Oslo. Områdekoder må gis som tekst med
-ledende nuller. Tilgjengelighet av område, format og koordinatsystem
+`area = "Oslo"`. Tilgjengelighet av område, format og koordinatsystem
 bestemmes av Geonorge. `epsg` velger kildefilen; bruk
 [`sf::st_transform()`](https://r-spatial.github.io/sf/reference/st_transform.html)
 hvis du trenger en annen projeksjon etter innlesing.
+
+## Velge område
+
+``` r
+
+n_areas("N1000")  # publiserte navn, områdekoder, EPSG-koder og formater
+veg <- n_get("Veglenke", "N1000", area = "Oslo")
+veg <- n_get("Veglenke", "N1000", area = "Oslo", epsg = 25832)
+```
+
+Navn ignorerer store/små bokstaver og mellomrom rundt navnet. Ukjente
+navn gir forslag; tvetydige navn krever en kode fra
+[`n_areas()`](https://hmalmedal.github.io/kartdata/reference/n_areas.md).
+Områdekoder fungerer fortsatt: `"03"` eller `3` for Oslo, `"0301"` eller
+`301` for en firesifret kode dersom den er publisert for serien.
+`"Norge"`, `"landsdekkende"`, `0` og `"0000"` betyr landsdekkende.
+EPSG:25833 er fortsatt standard også ved navnevalg.
+
+[`n_areas()`](https://hmalmedal.github.io/kartdata/reference/n_areas.md)
+laster bare metadata, ikke kartdata. Oversikten caches lokalt og kan
+brukes uten nett etter første oppslag.
+`n_areas("N1000", refresh = TRUE)` henter en ny oversikt.
+`refresh = "check"` eller `"force"` i
+[`n_get()`](https://hmalmedal.github.io/kartdata/reference/n_layers.md)/[`n_layers()`](https://hmalmedal.github.io/kartdata/reference/n_layers.md)
+oppdaterer også oversikten når du bruker områdenavn. Bruk en eksplisitt
+kode hvis du har eldre nedlastede data, men ennå ikke har cachet
+områdeoversikten. Oversikten viser publiserte nedlastingsområder; den er
+ikke et komplett kommuneregister. Områdenavn og administrative koder
+hentes fra Geonorge.
+[`n_cache_clear()`](https://hmalmedal.github.io/kartdata/reference/n_cache_info.md)
+fjerner også områdeoversikten for valgte serier; `memory_only = TRUE`
+beholder den.
+[`n_cache_info()`](https://hmalmedal.github.io/kartdata/reference/n_cache_info.md)
+viser kartarkivene, ikke de små tabellene med områdeinformasjon.
 
 ## Format og lag
 

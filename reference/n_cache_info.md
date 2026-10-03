@@ -2,7 +2,9 @@
 
 Progress messages for network checks and checksum verification follow
 `options(kartdata.progress)`, defaulting to
-[`interactive()`](https://rdrr.io/r/base/interactive.html).
+[`interactive()`](https://rdrr.io/r/base/interactive.html). Clearing
+disk cache also removes area lookup tables for the selected series.
+These small metadata tables are not listed by `n_cache_info()`.
 
 ## Usage
 
