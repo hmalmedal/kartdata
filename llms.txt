@@ -1,4 +1,5 @@
-# kartdata
+[![R-CMD-check](https://github.com/hmalmedal/kartdata/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/hmalmedal/kartdata/actions/workflows/R-CMD-check.yaml)
+\# kartdata
 
 Én R-klient for Kartverkets topografiske N-serie: N50, N100, N250, N500,
 N1000, N2000 og N5000. Pakken distribuerer ingen kartdata.

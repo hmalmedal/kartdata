@@ -45,9 +45,7 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="kartdata">kartdata<a class="anchor" aria-label="anchor" href="#kartdata"></a>
-</h1></div>
+  <main id="main" class="col-md-9"><p><a href="https://github.com/hmalmedal/kartdata/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/hmalmedal/kartdata/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <!-- badges: end --> # kartdata</p>
 <p>Én R-klient for Kartverkets topografiske N-serie: N50, N100, N250, N500, N1000, N2000 og N5000. Pakken distribuerer ingen kartdata. Originalfilene lastes direkte fra Kartverket/Geonorge og caches lokalt hos brukeren.</p>
 <p>Pakken er tilgjengelig på <a href="https://github.com/hmalmedal/kartdata" class="external-link">GitHub</a> og kan installeres direkte derfra:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -132,7 +130,7 @@
 <span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"integration"</span><span class="op">)</span></span></code></pre></div>
 <p>Vanlig <code>R CMD check</code> laster ikke ned kartdata eller kontakter Geonorge. De gamle pakkene erstattes i brukerens kode ved å endre for eksempel <code>N1000::Veglenke</code> til <code>kartdata::n_get("Veglenke", "N1000")</code>. Ingen databygging, dataversjonscommitter eller force-push er nødvendig.</p>
 </div>
-</div>
+
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
