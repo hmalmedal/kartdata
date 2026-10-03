@@ -1,3 +1,6 @@
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/hmalmedal/kartdata/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/hmalmedal/kartdata/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
 # kartdata
 
 Én R-klient for Kartverkets topografiske N-serie: N50, N100, N250, N500,
