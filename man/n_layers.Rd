@@ -28,7 +28,11 @@ n_get(
 \arguments{
 \item{series}{N-series, such as \code{"N1000"} or \code{1000}.}
 
-\item{area}{Character area code; \code{"0000"} selects nationwide data.}
+\item{area}{Area name (e.g. \code{"Oslo"}), character code (\code{"03"}), or numeric
+code (\code{3}). \code{"Norge"}, \code{"landsdekkende"}, \code{0} and \code{"0000"} select Norway.
+Names ignore case and surrounding spaces but must match unambiguously.
+See \code{\link[=n_areas]{n_areas()}} for published areas. Name lookup uses a local metadata
+table; \code{refresh = "check"} or \code{"force"} also updates that table.}
 
 \item{epsg}{EPSG code of the published file, default 25833. This selects a
 download; it does not reproject data.}

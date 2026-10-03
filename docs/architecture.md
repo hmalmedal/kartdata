@@ -102,6 +102,7 @@ skjemaer mellom GML og FGDB. Begge ga 14 467 Veglenke-objekter i live-testen.
 ## Implementasjon og begrensninger
 
 - `products.R`: statisk produktregister og inputvalidering.
+- `areas.R`: publiserte områdenavn, koder og EPSG/format-kombinasjoner fra ATOM.
 - `discovery.R`: HTTP, namespace-bevisst XML-lesing, produkt-/filvalg og drivere.
 - `cache.R`: cache per serie/område/EPSG/format, original ZIP, utpakking,
   DCF-metadata, tekstlig filinventar, sjekk og tømming.
@@ -139,6 +140,20 @@ med indeks opptok omtrent 13,5 MB i minnecachen. Tallene er enkeltmålinger,
 ikke garantier for andre maskiner eller datasett.
 
 Avhengigheter i kjøretid: sf, httr2 og xml2. Base R brukes til øvrig arbeid.
+Områdenavn slås opp eksakt (uten hensyn til store/små bokstaver) i en liten
+UTF-8-tabell under brukerens cache. `n_areas()` oppdager fylke-/kommunenavn fra
+ATOM category-label og områdekode fra publisert filnavn. Hele oversikten for
+serien brukes til å oppdage tvetydige navn, ikke bare tidligere nedlastede områder.
+EPSG velges fortsatt eksplisitt. Tabellen kan oppdateres med `refresh = TRUE`
+og gjenbrukes uten nett; navnebaserte kall med check/force oppdaterer den også.
+Navn og tallkoder normaliseres til eksisterende tegnkode før cacheoppslag.
+Dermed deles både fil- og minnecache mellom for eksempel Oslo, "03" og 3.
+Tall under 100 tolkes som tosifrede koder, øvrige som firesifrede; 0 betyr Norge.
+Eksplisitte tegnkoder bevarer ledende nuller. Områdetabellen slettes sammen med
+seriens cache, men ikke ved tømming av bare minne. Ingen kartarkiver må lastes
+ned for å vise listen. Områdeoppdagelse ble prøvd mot alle sju aktive serier
+3. oktober 2026: N50–N250 hadde 373 områdekoder, N500–N2000 hadde 16,
+og N5000 hadde bare landsdekkende filer. Tilgjengeligheten kan endres.
 Cacheoppdatering bygges i egen midlertidig mappe. ZIP-medlemsstier valideres
 før utpakking, størrelser kontrolleres og GDAL må kunne liste lag før mappen
 erstatter gammel cache. En låsemappe hindrer samtidige skrivere til samme

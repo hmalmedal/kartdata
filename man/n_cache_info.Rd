@@ -42,6 +42,8 @@ layer index); \code{cached_layers} counts retained sf layers in this R session.
 \description{
 Progress messages for network checks and checksum verification follow
 \code{options(kartdata.progress)}, defaulting to \code{interactive()}.
+Clearing disk cache also removes area lookup tables for the selected series.
+These small metadata tables are not listed by \code{n_cache_info()}.
 }
 \examples{
 n_cache_info()

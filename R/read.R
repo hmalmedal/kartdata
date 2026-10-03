@@ -65,7 +65,11 @@ layer_index <- function(directory, format) {
 #' Memory cache hits produce no read or layer discovery messages.
 #'
 #' @param series N-series, such as `"N1000"` or `1000`.
-#' @param area Character area code; `"0000"` selects nationwide data.
+#' @param area Area name (e.g. `"Oslo"`), character code (`"03"`), or numeric
+#'   code (`3`). `"Norge"`, `"landsdekkende"`, `0` and `"0000"` select Norway.
+#'   Names ignore case and surrounding spaces but must match unambiguously.
+#'   See [n_areas()] for published areas. Name lookup uses a local metadata
+#'   table; `refresh = "check"` or `"force"` also updates that table.
 #' @param epsg EPSG code of the published file, default 25833. This selects a
 #'   download; it does not reproject data.
 #' @param format `"auto"` prefers FGDB when available and locally readable,

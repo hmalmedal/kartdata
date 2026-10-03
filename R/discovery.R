@@ -97,5 +97,6 @@ discover <- function(sel) {
                                 list(format = format, feed = feed, url = file$url, updated = file$updated)))
   }
   abort("No readable Geonorge archive for ", sel$series, ", area ", sel$area,
-        ", EPSG:", sel$epsg, ". Try another area, EPSG code or format.")
+        ", EPSG:", sel$epsg, ". See n_areas('", sel$series,
+        "') for available areas, EPSG codes and formats.")
 }

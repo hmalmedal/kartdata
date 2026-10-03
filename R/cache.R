@@ -57,6 +57,7 @@ unpack_archive <- function(archive, directory) {
 }
 
 ensure_cache <- function(sel, refresh, cache_dir) {
+  sel$area <- resolve_area(sel, refresh, cache_dir)
   root <- cache_root(cache_dir)
   formats <- if (sel$format == "auto") readable_formats() else intersect(sel$format, readable_formats())
   if (!length(formats)) abort("Local GDAL cannot read the requested format. Install sf with OpenFileGDB or GML support.")
@@ -122,6 +123,8 @@ cache_paths <- function(cache_dir, series = NULL) {
 #'
 #' Progress messages for network checks and checksum verification follow
 #' `options(kartdata.progress)`, defaulting to `interactive()`.
+#' Clearing disk cache also removes area lookup tables for the selected series.
+#' These small metadata tables are not listed by `n_cache_info()`.
 #'
 #' @param series Optional series filter; `NULL` selects all series.
 #' @param cache_dir Cache root; defaults to the standard R user cache.
@@ -182,6 +185,11 @@ n_cache_clear <- function(series = NULL, cache_dir = tools::R_user_dir("kartdata
     abort("memory_only must be TRUE or FALSE.")
   memory_clear(cache_dir, series)
   if (memory_only) return(invisible(character()))
+  catalogs <- vapply(if (is.null(series)) n_products()$series else series,
+                     area_catalog_path, character(1), cache_dir = cache_dir)
+  for (catalog in catalogs[file.exists(catalogs)]) {
+    if (unlink(catalog) != 0L) abort("Could not remove area catalog: ", catalog)
+  }
   paths <- cache_paths(cache_dir, series)
   root <- normalizePath(cache_root(cache_dir), winslash = "/", mustWork = FALSE)
   for (path in paths) {

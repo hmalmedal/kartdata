@@ -39,9 +39,7 @@ series_name <- function(series) {
 
 selection <- function(series, area, epsg, format) {
   series <- series_name(series)
-  scalar_text(area, "area")
-  if (!grepl("^[0-9]{2}([0-9]{2})?$", area))
-    abort("area must be a character code, e.g. '0000' (Norway) or '03' (Oslo).")
+  area <- area_input(area)
   if (!is.numeric(epsg) || length(epsg) != 1L || is.na(epsg) ||
       !is.finite(epsg) || epsg < 1 || epsg != floor(epsg)) abort("epsg must be a positive integer.")
   format <- match.arg(format, c("auto", "FGDB", "GML"))
