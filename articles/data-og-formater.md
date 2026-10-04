@@ -1,0 +1,75 @@
+# Forstå kartdataene
+
+Eksemplene vises uten å kjøres når dokumentasjonen bygges. Kjør dem selv
+for å hente data; første bruk kan kreve nettverk og nedlasting.
+
+## Format og lag
+
+`format = "auto"` foretrekker FGDB hvis både Geonorge og lokal GDAL
+støtter det, ellers GML. Du kan velge `format = "GML"` eksplisitt.
+
+I FGDB ligger objekttyper som Veglenke og Bane i felles temalag.
+Klienten lar deg velge en objekttype uten at du trenger å kjenne
+strukturen i temalaget.
+[`n_layers()`](https://hmalmedal.github.io/kartdata/reference/n_layers.md)
+viser både disse navnene og de originale fysiske FGDB-lagene. Hvis en
+objekttype finnes i flere lag, ber feilmeldingen deg velge et fysisk
+lag. GML har egne lag per objekttype. Attributtnavn og datatyper kan
+derfor variere mellom formatene. Hvis et fremtidig FGDB-skjema ikke har
+`objtype`, velg GML eksplisitt.
+
+Ingen automatisk sletting av `gml_id`, datovask, nullutfylling eller
+ASCII-translitterering utføres. Originale verdier og GDALs datatyper
+beholdes.
+
+## Datavask i egne analyser
+
+Kontroller feltene med `names(veg)`, `str(veg)` og `sf::st_crs(veg)` før
+du bruker dem i en analyse. Pakken reparerer ikke geometri eller endrer
+projeksjon automatisk. Bruk
+[`sf::st_transform()`](https://r-spatial.github.io/sf/reference/st_transform.html)
+når du ønsker å reprojisere data.
+
+- `gml_id` beholdes når feltet finnes; det kan brukes til å identifisere
+  objekter.
+- Datoverdien `1000-01-01` erstattes ikke automatisk med `NA`.
+  Kontroller produktets definisjon før du behandler en verdi som
+  manglende.
+- Dato- og tidskolonner beholder GDALs datatyper. Konvertering til
+  `Date` kan fjerne tidspunkt og bør være et bevisst valg i analysen.
+- Kommunenumre nullutfylles ikke automatisk. Behandle administrative
+  koder som tekst dersom ledende nuller er viktige.
+- Norske tegn beholdes i lagnavn. Bruk navnene returnert av
+  [`n_layers()`](https://hmalmedal.github.io/kartdata/reference/n_layers.md).
+
+Ved en ukjent objekttype viser feilen tilgjengelige lag. Ved en tvetydig
+objekttype velger du et av de fysiske lagene oppgitt i feilen. Ved feil
+i selve filen eller et endret skjema må du reparere cachen eller velge
+GML eksplisitt.
+
+``` r
+
+library(kartdata)
+veg <- n_get("Veglenke", "N1000", format = "GML")
+names(veg)
+str(veg)
+sf::st_crs(veg)
+veg_lonlat <- sf::st_transform(veg, 4326)
+```
+
+## Kreditering og lisens
+
+Pakkekoden er GPL (\>= 3). Kartverkets data har en separat lisens:
+[Creative Commons Navngivelse
+4.0](https://creativecommons.org/licenses/by/4.0/), verifisert mot
+[Kartverkets
+bruksvilkår](https://www.kartverket.no/api-og-data/vilkar-for-bruk) 28.
+september 2026. Ved publisering: krediter **© Kartverket**, lenk til
+lisensen, oppgi produkt og gjerne dataversjon, og opplys om egne
+endringer. Klienten gir ingen garanti for datakvalitet eller løpende
+tjenestetilgjengelighet.
+
+Se også [Kom i
+gang](https://hmalmedal.github.io/kartdata/articles/kartdata.md) og
+[Cache, oppdatering og
+ytelse](https://hmalmedal.github.io/kartdata/articles/cache.md).

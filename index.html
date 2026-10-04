@@ -31,7 +31,16 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/kartdata.html">Kom i gang</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-veiledninger" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Veiledninger</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-veiledninger">
+<li><a class="dropdown-item" href="articles/cache.html">Cache, oppdatering og ytelse</a></li>
+    <li><a class="dropdown-item" href="articles/data-og-formater.html">Forstå kartdataene</a></li>
+    <li><a class="external-link dropdown-item" href="https://github.com/hmalmedal/kartdata/blob/master/docs/architecture.md">Arkitektur og utvikling</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -45,92 +54,53 @@
   </div>
 </nav><div class="container template-home">
 <div class="row">
-  <main id="main" class="col-md-9"><p><a href="https://github.com/hmalmedal/kartdata/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/hmalmedal/kartdata/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <!-- badges: end --> # kartdata</p>
-<p>Én R-klient for Kartverkets topografiske N-serie: N50, N100, N250, N500, N1000, N2000 og N5000. Pakken distribuerer ingen kartdata. Originalfilene lastes direkte fra Kartverket/Geonorge og caches lokalt hos brukeren.</p>
-<p>Pakken er tilgjengelig på <a href="https://github.com/hmalmedal/kartdata" class="external-link">GitHub</a> og kan installeres direkte derfra:</p>
+  <main id="main" class="col-md-9"><div class="section level1">
+<div class="page-header"><h1 id="kartdata">kartdata<a class="anchor" aria-label="anchor" href="#kartdata"></a>
+</h1></div>
+<!-- badges: start -->
+
+<p>Én R-klient for Kartverkets topografiske N-serie: N50, N100, N250, N500, N1000, N2000 og N5000. Pakken distribuerer ingen kartdata. Filene hentes direkte fra Geonorge, caches hos brukeren og leses som <code>sf</code>-objekter ved behov.</p>
+<div class="section level2">
+<h2 id="installasjon">Installasjon<a class="anchor" aria-label="anchor" href="#installasjon"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>  <span class="co"># nødvendig bare hvis remotes ikke er installert</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span>  <span class="co"># hvis remotes ikke er installert</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"hmalmedal/kartdata"</span><span class="op">)</span></span></code></pre></div>
-<p>Fra en lokal kopi av repositoriet kan du også installere kildepakken med <code>R CMD INSTALL .</code> når <code>sf</code>, <code>httr2</code> og <code>xml2</code> er installert.</p>
+</div>
+<div class="section level2">
+<h2 id="kom-i-gang">Kom i gang<a class="anchor" aria-label="anchor" href="#kom-i-gang"></a>
+</h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hmalmedal/kartdata" class="external-link">kartdata</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/n_products.html">n_products</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/n_layers.html">n_layers</a></span><span class="op">(</span><span class="st">"N1000"</span><span class="op">)</span></span>
-<span><span class="va">veg</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Veglenke"</span>, <span class="st">"N1000"</span><span class="op">)</span>  <span class="co"># series = 1000 fungerer også</span></span>
+<span><span class="va">veg</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Veglenke"</span>, <span class="st">"N1000"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_geometry.html" class="external-link">st_geometry</a></span><span class="op">(</span><span class="va">veg</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>Første kall laster ned og pakker ut arkivet. Standardvalget er landsdekkende data i EPSG:25833. Særlig N50 kan kreve betydelig diskplass og nedlastingstid. Bare det valgte laget leses til et <code>sf</code>-objekt. Velg eventuelt et mindre publisert område, for eksempel <code>area = "Oslo"</code>. Tilgjengelighet av område, format og koordinatsystem bestemmes av Geonorge. <code>epsg</code> velger kildefilen; bruk <code><a href="https://r-spatial.github.io/sf/reference/st_transform.html" class="external-link">sf::st_transform()</a></code> hvis du trenger en annen projeksjon etter innlesing.</p>
-<div class="section level2">
-<h2 id="velge-område">Velge område<a class="anchor" aria-label="anchor" href="#velge-omr%C3%A5de"></a>
-</h2>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/n_areas.html">n_areas</a></span><span class="op">(</span><span class="st">"N1000"</span><span class="op">)</span>  <span class="co"># publiserte navn, områdekoder, EPSG-koder og formater</span></span>
-<span><span class="va">veg</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Veglenke"</span>, <span class="st">"N1000"</span>, area <span class="op">=</span> <span class="st">"Oslo"</span><span class="op">)</span></span>
-<span><span class="va">veg</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Veglenke"</span>, <span class="st">"N1000"</span>, area <span class="op">=</span> <span class="st">"Oslo"</span>, epsg <span class="op">=</span> <span class="fl">25832</span><span class="op">)</span></span></code></pre></div>
-<p>Navn ignorerer store/små bokstaver og mellomrom rundt navnet. Ukjente navn gir forslag; tvetydige navn krever en kode fra <code><a href="reference/n_areas.html">n_areas()</a></code>. Områdekoder fungerer fortsatt: <code>"03"</code> eller <code>3</code> for Oslo, <code>"0301"</code> eller <code>301</code> for en firesifret kode dersom den er publisert for serien. <code>"Norge"</code>, <code>"landsdekkende"</code>, <code>0</code> og <code>"0000"</code> betyr landsdekkende. EPSG:25833 er fortsatt standard også ved navnevalg.</p>
-<p><code><a href="reference/n_areas.html">n_areas()</a></code> laster bare metadata, ikke kartdata. Oversikten caches lokalt og kan brukes uten nett etter første oppslag. <code>n_areas("N1000", refresh = TRUE)</code> henter en ny oversikt. <code>refresh = "check"</code> eller <code>"force"</code> i <code><a href="reference/n_layers.html">n_get()</a></code>/<code><a href="reference/n_layers.html">n_layers()</a></code> oppdaterer også oversikten når du bruker områdenavn. Bruk en eksplisitt kode hvis du har eldre nedlastede data, men ennå ikke har cachet områdeoversikten. Oversikten viser publiserte nedlastingsområder; den er ikke et komplett kommuneregister. Områdenavn og administrative koder hentes fra Geonorge. <code><a href="reference/n_cache_info.html">n_cache_clear()</a></code> fjerner også områdeoversikten for valgte serier; <code>memory_only = TRUE</code> beholder den. <code><a href="reference/n_cache_info.html">n_cache_info()</a></code> viser kartarkivene, ikke de små tabellene med områdeinformasjon.</p>
+<p>Første kall laster ned og pakker ut originalarkivet i brukerens cache, utenfor prosjektet og Git. Bare ønsket lag leses til R. Standardvalget er hele Norge i EPSG:25833; velg for eksempel <code>area = "Oslo"</code> for et mindre publisert område. Særlig N50 kan kreve betydelig diskplass og nedlastingstid. Senere kall gjenbruker cache; bruk <code>refresh = "check"</code> for å se etter oppdaterte data.</p>
 </div>
 <div class="section level2">
-<h2 id="format-og-lag">Format og lag<a class="anchor" aria-label="anchor" href="#format-og-lag"></a>
+<h2 id="veiledninger">Veiledninger<a class="anchor" aria-label="anchor" href="#veiledninger"></a>
 </h2>
-<p><code>format = "auto"</code> foretrekker FGDB hvis både Geonorge og lokal GDAL støtter det, ellers GML. Du kan velge <code>format = "GML"</code> eksplisitt.</p>
-<p>I FGDB ligger objekttyper som Veglenke og Bane i felles temalag. Klienten finner objekttypene med <code>SELECT DISTINCT objtype</code> uten å lese geometriene til R, og leser ønsket objekttype med et SQL-filter i GDAL. <code><a href="reference/n_layers.html">n_layers()</a></code> viser både disse navnene og de originale fysiske FGDB-lagene. Hvis en objekttype finnes i flere lag, ber feilmeldingen deg velge et fysisk lag. GML har egne lag per objekttype. Attributtnavn og datatyper kan derfor variere mellom formatene. Hvis et fremtidig FGDB-skjema ikke har <code>objtype</code>, velg GML eksplisitt.</p>
-<p>Ingen automatisk sletting av <code>gml_id</code>, datovask, nullutfylling eller ASCII-translitterering utføres. Originale verdier og GDALs datatyper beholdes. Se <a href="docs/architecture.html">analyse og begrunnelse</a>.</p>
-</div>
-<div class="section level2">
-<h2 id="cache-og-oppdatering">Cache og oppdatering<a class="anchor" aria-label="anchor" href="#cache-og-oppdatering"></a>
-</h2>
-<p>I interaktive R-økter vises framdrift under nedlasting og FGDB-lagoppdagelse. Telleren ved lagoppdagelse viser andelen ferdig undersøkte fysiske lag, ikke andelen brukt tid. Utpakking, sjekksumberegning og innlesing viser hvilken operasjon som pågår. GDAL gir ikke prosentframdrift for selve innlesingen; etter vellykket lesing vises antall objekter. Raske minnecachetreff er stille.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>kartdata.progress <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># slå av framdriftsvisning</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>kartdata.progress <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>   <span class="co"># slå på, også i skript</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>kartdata.progress <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>   <span class="co"># standard: bare interaktivt</span></span></code></pre></div>
-<p>Skript og vanlige tester er stille som standard. Feil og advarsler vises uavhengig av denne innstillingen.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/n_cache_info.html">n_cache_info</a></span><span class="op">(</span><span class="op">)</span>                       <span class="co"># innhold, diskbruk og integritet</span></span>
-<span><span class="fu"><a href="reference/n_cache_info.html">n_cache_info</a></span><span class="op">(</span>check <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>           <span class="co"># sjekk versjoner via ATOM, ingen kartnedlasting</span></span>
-<span><span class="fu"><a href="reference/n_cache_info.html">n_cache_info</a></span><span class="op">(</span>verify <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>          <span class="co"># kontroller også ZIP-sjekksum</span></span>
-<span><span class="va">veg</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Veglenke"</span>, <span class="fl">1000</span>, refresh <span class="op">=</span> <span class="st">"check"</span><span class="op">)</span></span>
-<span><span class="va">veg</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Veglenke"</span>, <span class="fl">1000</span>, refresh <span class="op">=</span> <span class="st">"force"</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/n_cache_info.html">n_cache_clear</a></span><span class="op">(</span><span class="st">"N1000"</span><span class="op">)</span>               <span class="co"># fjern bare denne serien</span></span>
-<span><span class="fu"><a href="reference/n_cache_info.html">n_cache_clear</a></span><span class="op">(</span><span class="op">)</span>                      <span class="co"># fjern alle kartdata-cacheoppføringer</span></span></code></pre></div>
-<p>Lagoversikten og ferdig innleste <code>sf</code>-objekter caches også i minnet i samme R-økt. Gjentatte kall til <code><a href="reference/n_layers.html">n_get()</a></code> slipper dermed både lagoppdagelse og innlesing via GDAL. Originalfilene kontrolleres fortsatt, og <code>refresh = "check"</code> sjekker fortsatt Geonorge før gjenbruk. Oppdatering av diskcachen ugyldiggjør tilhørende minnecache, også ved <code>refresh = "force"</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">veg</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Veglenke"</span>, <span class="fl">1000</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="va">veg</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Veglenke"</span>, <span class="fl">1000</span><span class="op">)</span><span class="op">)</span>  <span class="co"># gjenbruk fra minnet</span></span>
-<span><span class="fu"><a href="reference/n_cache_info.html">n_cache_info</a></span><span class="op">(</span><span class="op">)</span>                              <span class="co"># memory_bytes og cached_layers</span></span>
-<span><span class="fu"><a href="reference/n_cache_info.html">n_cache_clear</a></span><span class="op">(</span><span class="st">"N1000"</span>, memory_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>  <span class="co"># behold nedlastede filer</span></span>
-<span></span>
-<span><span class="co"># Valgfri justering av samlet minnegrense (standard: 128 MiB)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>kartdata.memory_cache_size <span class="op">=</span> <span class="fl">256</span> <span class="op">*</span> <span class="fl">1024</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
-<span><span class="va">veg</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Veglenke"</span>, <span class="fl">1000</span>, memory_cache <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span>  <span class="co"># omgå minnecache</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>kartdata.memory_cache_size <span class="op">=</span> <span class="fl">0</span><span class="op">)</span>               <span class="co"># deaktiver minnecache</span></span></code></pre></div>
-<p>Minnegrensen gjelder omtrentlige objektstørrelser; samlet RAM-bruk kan være høyere under innlesing. Minst nylig brukte oppføringer fjernes først. Et lag større enn grensen returneres uten å beholdes i minnecachen. En endret grense håndheves ved neste cachekall. Minnecachen forsvinner når R avsluttes; første innlesing i en ny økt bruker originalfilene igjen. Det lagres ingen innleste kartobjekter på disk. <code><a href="reference/n_cache_info.html">n_cache_clear()</a></code> tømmer både disk- og minnecache for valgte serier.</p>
-<p>Standardplasseringen er <code>tools::R_user_dir("kartdata", "cache")</code>, utenfor prosjektet og Git. Original ZIP, utpakkede originalfiler og små tekstbaserte cachemetadata beholdes. Ingen kartdata konverteres til RDA, RDS eller Parquet.</p>
-<p>Standard <code>refresh = "never"</code> gjenbruker cache uten nettverk. Manglende cache lastes ned. <code>"check"</code> sammenligner filens URL og ATOM-verdien <code>updated</code>; enhver endring utløser ny nedlasting. Dette er et versjonssignal fra Geonorge, ikke en garanti for at data aldri endres under samme tidsstempel. Bruk <code>"force"</code> ved behov. Feil under en oppdatering gir en feilmelding og lar gammel cache ligge. Bruk deretter <code>refresh = "never"</code> for å arbeide videre med den.</p>
-<p>Integritetskontroll ved gjenbruk sjekker filenes tilstedeværelse og størrelse. <code>verify = TRUE</code> kontrollerer også originalarkivets MD5 mot verdien lagret ved nedlasting. En korrupt cache kan repareres med <code>refresh = "force"</code>. Et annet cacheområde kan velges med <code>cache_dir</code>; velg et område utenfor Git. Ikke kjør tømming og lesing samtidig fra forskjellige R-prosesser.</p>
+<ul>
+<li>
+<a href="https://hmalmedal.github.io/kartdata/articles/kartdata.html">Kom i gang</a>: velge serie, område, koordinatsystem og lag.</li>
+<li>
+<a href="https://hmalmedal.github.io/kartdata/articles/cache.html">Cache, oppdatering og ytelse</a>: bruk uten nett, minnecache, framdrift og feilsøking.</li>
+<li>
+<a href="https://hmalmedal.github.io/kartdata/articles/data-og-formater.html">Forstå kartdataene</a>: formater, attributter og datavask.</li>
+<li>
+<a href="https://hmalmedal.github.io/kartdata/reference/index.html">Funksjonsreferanse</a>: argumenter og returverdier.</li>
+<li>
+<a href="https://github.com/hmalmedal/kartdata/blob/master/docs/architecture.md" class="external-link">Arkitektur og utvikling</a>: tekniske valg, historikk og tester.</li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="kreditering-og-lisens">Kreditering og lisens<a class="anchor" aria-label="anchor" href="#kreditering-og-lisens"></a>
 </h2>
-<p>Pakkekoden er GPL (&gt;= 3). Kartverkets data har en separat lisens: <a href="https://creativecommons.org/licenses/by/4.0/" class="external-link">Creative Commons Navngivelse 4.0</a>, verifisert mot <a href="https://www.kartverket.no/api-og-data/vilkar-for-bruk" class="external-link">Kartverkets bruksvilkår</a> 28. september 2026. Ved publisering: krediter <strong>© Kartverket</strong>, lenk til lisensen, oppgi produkt og gjerne dataversjon, og opplys om egne endringer. Klienten gir ingen garanti for datakvalitet eller løpende tjenestetilgjengelighet.</p>
+<p>Pakkekoden er GPL (&gt;= 3). Kartverkets data har separat lisens: <a href="https://creativecommons.org/licenses/by/4.0/" class="external-link">CC BY 4.0</a>. Krediter <strong>© Kartverket</strong>, lenk til lisensen og opplys om egne endringer. Se <a href="https://www.kartverket.no/api-og-data/vilkar-for-bruk" class="external-link">Kartverkets bruksvilkår</a>.</p>
 </div>
-<div class="section level2">
-<h2 id="utvikling-og-tester">Utvikling og tester<a class="anchor" aria-label="anchor" href="#utvikling-og-tester"></a>
-</h2>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span><span class="op">)</span>  <span class="co"># små syntetiske FGDB/GML-filer, mockede HTTP-svar</span></span>
-<span></span>
-<span><span class="co"># Frivillig: bare metadata fra Geonorge, alle sju serier</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>KARTDATA_INTEGRATION <span class="op">=</span> <span class="st">"true"</span><span class="op">)</span></span>
-<span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"integration"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Frivillig: N1000-nedlasting til standard brukercache</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Sys.setenv.html" class="external-link">Sys.setenv</a></span><span class="op">(</span>KARTDATA_DOWNLOAD_TEST <span class="op">=</span> <span class="st">"true"</span><span class="op">)</span></span>
-<span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_package.html" class="external-link">test_local</a></span><span class="op">(</span>filter <span class="op">=</span> <span class="st">"integration"</span><span class="op">)</span></span></code></pre></div>
-<p>Vanlig <code>R CMD check</code> laster ikke ned kartdata eller kontakter Geonorge. De gamle pakkene erstattes i brukerens kode ved å endre for eksempel <code>N1000::Veglenke</code> til <code>kartdata::n_get("Veglenke", "N1000")</code>. Ingen databygging, dataversjonscommitter eller force-push er nødvendig.</p>
 </div>
-
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
@@ -162,7 +132,12 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/hmalmedal/kartdata/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/hmalmedal/kartdata/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
+</ul>
+</div>
 
   </aside>
 </div>
