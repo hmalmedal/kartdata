@@ -1,6 +1,6 @@
 Package: kartdata
 Title: Client for Norwegian Mapping Authority Topographic Data
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person("Håkon", "Malmedal", , "hmalmedal@gmail.com", role = c("aut", "cre"))
 Description: Discover and download topographic N-series data directly from
