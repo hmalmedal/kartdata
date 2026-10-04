@@ -1,0 +1,95 @@
+---
+title: "Kom i gang"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Kom i gang}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+Eksemplene vises uten å kjøres når dokumentasjonen bygges. Kjør dem selv
+for å hente data; første bruk kan kreve nettverk og nedlasting.
+
+Denne veiledningen viser hvordan du finner og leser Kartverkets topografiske
+kartdata. Pakken distribuerer ingen kartdata; originalfilene hentes fra Geonorge.
+
+## Installer og les ditt første lag
+
+```{r}
+install.packages("remotes")  # nødvendig bare hvis remotes ikke er installert
+remotes::install_github("hmalmedal/kartdata")
+```
+
+Fra en lokal kopi av repositoriet kan du også installere kildepakken med
+`R CMD INSTALL .` når `sf`, `httr2` og `xml2` er installert.
+
+```{r}
+library(kartdata)
+
+n_products()
+n_layers("N1000")
+veg <- n_get("Veglenke", "N1000")  # series = 1000 fungerer også
+plot(sf::st_geometry(veg))
+```
+
+Første kall laster ned og pakker ut arkivet. Standardvalget er landsdekkende
+data i EPSG:25833. Særlig N50 kan kreve betydelig diskplass og nedlastingstid.
+Bare det valgte laget leses til et `sf`-objekt. Velg eventuelt et mindre
+publisert område, for eksempel `area = "Oslo"`. Tilgjengelighet av område,
+format og koordinatsystem bestemmes av Geonorge. `epsg` velger kildefilen;
+bruk `sf::st_transform()` hvis du trenger en annen projeksjon etter innlesing.
+
+## Velge område
+
+```{r}
+n_areas("N1000")  # publiserte navn, områdekoder, EPSG-koder og formater
+veg <- n_get("Veglenke", "N1000", area = "Oslo")
+veg <- n_get("Veglenke", "N1000", area = "Oslo", epsg = 25832)
+```
+
+Navn ignorerer store/små bokstaver og mellomrom rundt navnet. Ukjente navn gir
+forslag; tvetydige navn krever en kode fra `n_areas()`. Områdekoder fungerer
+fortsatt: `"03"` eller `3` for Oslo, `"0301"` eller `301` for en firesifret
+kode dersom den er publisert for serien. `"Norge"`, `"landsdekkende"`, `0` og
+`"0000"` betyr landsdekkende. EPSG:25833 er fortsatt standard også ved navnevalg.
+
+`n_areas()` laster bare metadata, ikke kartdata. Oversikten caches lokalt og
+kan brukes uten nett etter første oppslag. `n_areas("N1000", refresh = TRUE)`
+henter en ny oversikt. `refresh = "check"` eller `"force"` i `n_get()`/`n_layers()`
+oppdaterer også oversikten når du bruker områdenavn. Bruk en eksplisitt kode
+hvis du har eldre nedlastede data, men ennå ikke har cachet områdeoversikten.
+Oversikten viser publiserte nedlastingsområder; den er ikke et komplett
+kommuneregister. Områdenavn og administrative koder hentes fra Geonorge.
+`n_cache_clear()` fjerner også områdeoversikten for valgte serier;
+`memory_only = TRUE` beholder den. `n_cache_info()` viser kartarkivene,
+ikke de små tabellene med områdeinformasjon.
+
+## Velge serie og lag
+
+`n_products()` viser tilgjengelige serier og målestokker. De grovere seriene
+inneholder færre detaljer og egner seg for oversiktskart. Tilgjengelige objekttyper
+varierer med serien; bruk `n_layers()` for å finne navnene som faktisk finnes.
+
+```{r}
+n_products()
+n_layers("N1000", area = "Oslo")
+veg <- n_get("Veglenke", 1000, area = "Oslo")
+```
+
+`n_areas()` henter bare metadata. `n_layers()` trenger selve arkivet og kan
+derfor utløse en nedlasting selv om du bare ønsker å se lagnavnene.
+
+## Fra N1000, N2000 og N5000
+
+Bytt for eksempel `N1000::Veglenke` med `kartdata::n_get("Veglenke", "N1000")`.
+Velg serie med et argument i stedet for å installere en pakke per serie.
+Bruk `n_layers()` for å finne dagens navn; norske tegn beholdes og navnene
+kan avvike fra de gamle ASCII-navnene.
+
+Attributter og datatyper kan også avvike fra de gamle, vaskede dataobjektene.
+Se [Forstå kartdataene](data-og-formater.html) før du gjenbruker gammel analyse.
+Les [Cache, oppdatering og ytelse](cache.html) for å styre oppdateringer og diskbruk.

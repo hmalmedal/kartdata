@@ -1,0 +1,116 @@
+---
+title: "Cache, oppdatering og ytelse"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Cache, oppdatering og ytelse}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
+```
+
+Eksemplene vises uten å kjøres når dokumentasjonen bygges. Kjør dem selv
+for å hente data; første bruk kan kreve nettverk og nedlasting.
+
+## Framdriftsvisning
+
+I interaktive R-økter vises framdrift under nedlasting og FGDB-lagoppdagelse.
+Telleren ved lagoppdagelse viser andelen ferdig undersøkte fysiske lag, ikke
+andelen brukt tid. Utpakking, sjekksumberegning og innlesing viser hvilken
+operasjon som pågår. GDAL gir ikke prosentframdrift for selve innlesingen;
+etter vellykket lesing vises antall objekter. Raske minnecachetreff er stille.
+
+```{r}
+options(kartdata.progress = FALSE)  # slå av framdriftsvisning
+options(kartdata.progress = TRUE)   # slå på, også i skript
+options(kartdata.progress = NULL)   # standard: bare interaktivt
+```
+
+Skript og vanlige tester er stille som standard. Feil og advarsler vises
+uavhengig av denne innstillingen.
+
+## Kontrollere og tømme cache
+
+```{r}
+n_cache_info()                       # innhold, diskbruk og integritet
+n_cache_info(check = TRUE)           # sjekk versjoner via ATOM, ingen kartnedlasting
+n_cache_info(verify = TRUE)          # kontroller også ZIP-sjekksum
+veg <- n_get("Veglenke", 1000, refresh = "check")
+veg <- n_get("Veglenke", 1000, refresh = "force")
+n_cache_clear("N1000")               # fjern bare denne serien
+n_cache_clear()                      # fjern alle kartdata-cacheoppføringer
+```
+
+## Minnecache og ytelse
+
+Lagoversikten og ferdig innleste `sf`-objekter caches også i minnet i samme
+R-økt. Gjentatte kall til `n_get()` slipper dermed både lagoppdagelse og
+innlesing via GDAL. Originalfilene kontrolleres fortsatt, og `refresh = "check"`
+sjekker fortsatt Geonorge før gjenbruk. Oppdatering av diskcachen ugyldiggjør
+tilhørende minnecache, også ved `refresh = "force"`.
+
+```{r}
+system.time(veg <- n_get("Veglenke", 1000))
+system.time(veg <- n_get("Veglenke", 1000))  # gjenbruk fra minnet
+n_cache_info()                              # memory_bytes og cached_layers
+n_cache_clear("N1000", memory_only = TRUE)  # behold nedlastede filer
+
+# Valgfri justering av samlet minnegrense (standard: 128 MiB)
+options(kartdata.memory_cache_size = 256 * 1024^2)
+veg <- n_get("Veglenke", 1000, memory_cache = FALSE)  # omgå minnecache
+options(kartdata.memory_cache_size = 0)               # deaktiver minnecache
+```
+
+Minnegrensen gjelder omtrentlige objektstørrelser; samlet RAM-bruk kan være
+høyere under innlesing. Minst nylig brukte oppføringer fjernes først. Et lag
+større enn grensen returneres uten å beholdes i minnecachen. En endret grense
+håndheves ved neste cachekall. Minnecachen forsvinner når R avsluttes; første
+innlesing i en ny økt bruker originalfilene igjen. Det lagres ingen innleste
+kartobjekter på disk. `n_cache_clear()` tømmer både disk- og minnecache for
+valgte serier.
+
+## Diskcache og oppdateringer
+
+Standardplasseringen er `tools::R_user_dir("kartdata", "cache")`, utenfor
+prosjektet og Git. Original ZIP, utpakkede originalfiler og små tekstbaserte
+cachemetadata beholdes. Ingen kartdata konverteres til RDA, RDS eller Parquet.
+
+Standard `refresh = "never"` gjenbruker cache uten nettverk. Manglende cache
+lastes ned. `"check"` sammenligner filens URL og ATOM-verdien `updated`;
+enhver endring utløser ny nedlasting. Dette er et versjonssignal fra Geonorge,
+ikke en garanti for at data aldri endres under samme tidsstempel. Bruk
+`"force"` ved behov. Feil under en oppdatering gir en feilmelding og lar gammel
+cache ligge. Bruk deretter `refresh = "never"` for å arbeide videre med den.
+
+Integritetskontroll ved gjenbruk sjekker filenes tilstedeværelse og størrelse.
+`verify = TRUE` kontrollerer også originalarkivets MD5 mot verdien lagret ved
+nedlasting. En korrupt cache kan repareres med `refresh = "force"`.
+Et annet cacheområde kan velges med `cache_dir`; velg et område utenfor Git.
+Ikke kjør tømming og lesing samtidig fra forskjellige R-prosesser.
+
+## Bruk uten nett og områdeoversikt
+
+Last ned området mens du har nett, og bruk deretter `refresh = "never"`.
+Navnevalg som `area = "Oslo"` trenger også en cachet områdeoversikt fra
+`n_areas()`. Har du bare eldre kartfiler i cache, kan du bruke områdekoden.
+`n_areas("N1000", refresh = TRUE)` oppdaterer områdeoversikten uten å laste
+ned kartdata. `n_cache_info()` viser kartarkivene, ikke denne lille tabellen.
+Vanlig tømming sletter også områdeoversikten; `memory_only = TRUE` beholder den.
+
+## Feilsøking
+
+- **Tregt første kall:** Arkivet må lastes ned og pakkes ut, og lagene må finnes.
+  Første lesing i en ny R-økt bruker originalfilene også når de er lastet ned.
+- **Tregt gjentatt kall:** Se `memory_bytes` og `cached_layers` i `n_cache_info()`.
+  Lag større enn minnegrensen beholdes ikke, og eldre oppføringer kan bli fjernet.
+- **Korrupt eller ufullstendig cache:** Kontroller med `n_cache_info(verify = TRUE)`
+  og last ned på nytt med `refresh = "force"`.
+- **Nettverksfeil under oppdatering:** Gammel cache beholdes. Bruk `refresh = "never"`
+  hvis du vil fortsette med den tidligere versjonen.
+- **Låst cache:** Vent på en eventuell nedlasting i en annen R-prosess.
+  Etter et krasj kan den tomme låsemappen oppgitt i feilen fjernes manuelt,
+  men bare etter at du har kontrollert at ingen nedlasting kjører.
+
+Se også [Kom i gang](kartdata.html) og [Forstå kartdataene](data-og-formater.html).

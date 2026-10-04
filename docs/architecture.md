@@ -173,3 +173,42 @@ eksplisitt opt-in. Ingen N50-nedlasting skjer i vanlig testing. Full innlesing
 av alle serier er ikke verifisert, bare generisk kode, alle feedoppslag og N1000
 med begge formater. Kartdata ligger utenfor Git; pakkeversjonen følger kode,
 mens cachemetadata følger dataversjonen.
+
+## Dokumentasjon og utvikling
+
+README er en kort inngang til pakken. Brukerveiledningene ligger i
+`vignettes/kartdata.Rmd`, `vignettes/cache.Rmd` og `vignettes/data-og-formater.Rmd`.
+Dette dokumentet beholder historikk, implementasjonsdetaljer og begrunnelser.
+Funksjonenes argumenter og returverdier vedlikeholdes i roxygen-kommentarene i R/.
+
+Bygg nettstedet lokalt med `pkgdown::build_site()`. Resultatet ligger i `_site`;
+`docs/architecture.md` er håndskrevet utviklerdokumentasjon, ikke generert HTML.
+[Pkgdowns artikkelbygging](https://pkgdown.r-lib.org/reference/build_articles.html)
+publiserer vignettene som veiledninger. Menyen styres i `_pkgdown.yml`.
+
+Vignettene har `eval = FALSE` som standard, slik at bygging verken henter
+Geonorge-data, endrer brukerens cache eller utfører eksemplene på tømming.
+Nye eksempler som skal evalueres må være selvstendige og uten nettverk.
+Korte introduksjoner kan gjentas i README, men lengre forklaringer skal ha én
+hovedplassering i riktig vignett. Oppdater tekniske begrunnelser her når
+implementasjonen endres.
+
+Installer lokalt fra repoet med `R CMD INSTALL .` når avhengighetene er installert.
+Ved dokumentasjonsendringer: bygg vignetter og pkgdown, og kontroller lenker.
+For pakkeendringer: kjør testene og `R CMD check --no-manual` på kildepakken.
+
+## Utvikling og tester
+
+```r
+testthat::test_local()  # små syntetiske FGDB/GML-filer, mockede HTTP-svar
+
+# Frivillig: bare metadata fra Geonorge, alle sju serier
+Sys.setenv(KARTDATA_INTEGRATION = "true")
+testthat::test_local(filter = "integration")
+
+# Frivillig: N1000-nedlasting til standard brukercache
+Sys.setenv(KARTDATA_DOWNLOAD_TEST = "true")
+testthat::test_local(filter = "integration")
+```
+
+Vanlig `R CMD check` laster ikke ned kartdata eller kontakter Geonorge.

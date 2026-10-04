@@ -11,7 +11,8 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Depends: R (>= 4.1.0)
 Imports: sf, httr2, xml2
-Suggests: testthat (>= 3.2.0), roxygen2, zip
+Suggests: testthat (>= 3.2.0), roxygen2, zip, knitr, rmarkdown
+VignetteBuilder: knitr
 Config/testthat/edition: 3
 URL: https://github.com/hmalmedal/kartdata, https://hmalmedal.github.io/kartdata/
 BugReports: https://github.com/hmalmedal/kartdata/issues

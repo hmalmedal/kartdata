@@ -2,3 +2,28 @@ url: https://hmalmedal.github.io/kartdata/
 destination: _site
 template:
   bootstrap: 5
+
+navbar:
+  structure:
+    left: [intro, reference, articles]
+    right: [search, github]
+  components:
+    intro:
+      text: Kom i gang
+      href: articles/kartdata.html
+    articles:
+      text: Veiledninger
+      menu:
+      - text: Cache, oppdatering og ytelse
+        href: articles/cache.html
+      - text: Forstå kartdataene
+        href: articles/data-og-formater.html
+      - text: Arkitektur og utvikling
+        href: https://github.com/hmalmedal/kartdata/blob/master/docs/architecture.md
+
+articles:
+- title: Brukerveiledninger
+  contents:
+  - kartdata
+  - cache
+  - data-og-formater
