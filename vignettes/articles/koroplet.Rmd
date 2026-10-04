@@ -108,10 +108,10 @@ For mer detaljerte kart kan du velge en annen serie.
 
 ```{r omrade}
 series <- "N2000"
-area <- "Troms"
+area_name <- "Troms"
 
 omrader <- n_areas(series)
-subset(omrader, name == area)
+subset(omrader, name == area_name)
 ```
 
 `n_areas()` viser publiserte områder, formater og koordinatsystemer.
@@ -119,10 +119,10 @@ Den henter bare metadata. Neste kall, `n_layers()`, trenger selve arkivet
 og kan derfor utløse nedlasting.
 
 ```{r kartlag}
-lag <- n_layers(series = series, area = area)
+lag <- n_layers(series = series, area = area_name)
 "Kommune" %in% lag
 
-kommuner <- n_get("Kommune", series = series, area = area)
+kommuner <- n_get("Kommune", series = series, area = area_name)
 names(kommuner)
 sf::st_crs(kommuner)
 
@@ -233,9 +233,9 @@ Da kan kommuneformene være vanskelige å kjenne igjen. Vi legger derfor
 vannflater over kommunefargene og tegner kystlinjen øverst.
 
 ```{r vannlag}
-hav <- n_get("Havflate", series = series, area = area)
-innsjoer <- n_get("Innsjø", series = series, area = area)
-kyst <- n_get("Kystkontur", series = series, area = area)
+hav <- n_get("Havflate", series = series, area = area_name)
+innsjoer <- n_get("Innsjø", series = series, area = area_name)
+kyst <- n_get("Kystkontur", series = series, area = area_name)
 ```
 
 Dette er flere lag fra samme arkiv, så filene kan gjenbrukes fra cache.
