@@ -10,7 +10,7 @@ behov.
 ``` r
 
 install.packages("remotes")  # hvis remotes ikke er installert
-remotes::install_github("hmalmedal/kartdata")
+remotes::install_github("hmalmedal/kartdata", build_vignettes = TRUE)
 ```
 
 ## Kom i gang
