@@ -21,7 +21,7 @@ kartdata. Pakken distribuerer ingen kartdata; originalfilene hentes fra Geonorge
 
 ```{r}
 install.packages("remotes")  # nødvendig bare hvis remotes ikke er installert
-remotes::install_github("hmalmedal/kartdata")
+remotes::install_github("hmalmedal/kartdata", build_vignettes = TRUE)
 ```
 
 Fra en lokal kopi av repositoriet kan du også installere kildepakken med
