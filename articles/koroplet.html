@@ -173,22 +173,23 @@ kartet fargelagt.</p>
 oversiktskart. For mer detaljerte kart kan du velge en annen serie.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">series</span> <span class="op">&lt;-</span> <span class="st">"N2000"</span></span>
-<span><span class="va">area</span> <span class="op">&lt;-</span> <span class="st">"Troms"</span></span>
+<span><span class="va">area_name</span> <span class="op">&lt;-</span> <span class="st">"Troms"</span></span>
 <span></span>
 <span><span class="va">omrader</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_areas.html">n_areas</a></span><span class="op">(</span><span class="va">series</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">omrader</span>, <span class="va">name</span> <span class="op">==</span> <span class="va">area</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] area   name   epsg   format</span></span>
-<span><span class="co">#&gt; &lt;0 rows&gt; (or 0-length row.names)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="va">omrader</span>, <span class="va">name</span> <span class="op">==</span> <span class="va">area_name</span><span class="op">)</span></span>
+<span><span class="co">#&gt;    area  name  epsg format</span></span>
+<span><span class="co">#&gt; 55   55 Troms 25833   FGDB</span></span>
+<span><span class="co">#&gt; 56   55 Troms 25833    GML</span></span></code></pre></div>
 <p><code><a href="../reference/n_areas.html">n_areas()</a></code> viser publiserte områder, formater og
 koordinatsystemer. Den henter bare metadata. Neste kall,
 <code><a href="../reference/n_layers.html">n_layers()</a></code>, trenger selve arkivet og kan derfor utløse
 nedlasting.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">lag</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_layers.html">n_layers</a></span><span class="op">(</span>series <span class="op">=</span> <span class="va">series</span>, area <span class="op">=</span> <span class="va">area</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">lag</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_layers.html">n_layers</a></span><span class="op">(</span>series <span class="op">=</span> <span class="va">series</span>, area <span class="op">=</span> <span class="va">area_name</span><span class="op">)</span></span>
 <span><span class="st">"Kommune"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">lag</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span></span>
-<span><span class="va">kommuner</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Kommune"</span>, series <span class="op">=</span> <span class="va">series</span>, area <span class="op">=</span> <span class="va">area</span><span class="op">)</span></span>
+<span><span class="va">kommuner</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Kommune"</span>, series <span class="op">=</span> <span class="va">series</span>, area <span class="op">=</span> <span class="va">area_name</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">kommuner</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "objtype"          "navn"             "oppdateringsdato" "kommunenummer"   </span></span>
 <span><span class="co">#&gt; [5] "SHAPE_Length"     "SHAPE_Area"       "SHAPE"</span></span>
@@ -382,9 +383,9 @@ tallene med 100.</p>
 sjøen. Da kan kommuneformene være vanskelige å kjenne igjen. Vi legger
 derfor vannflater over kommunefargene og tegner kystlinjen øverst.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">hav</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Havflate"</span>, series <span class="op">=</span> <span class="va">series</span>, area <span class="op">=</span> <span class="va">area</span><span class="op">)</span></span>
-<span><span class="va">innsjoer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Innsjø"</span>, series <span class="op">=</span> <span class="va">series</span>, area <span class="op">=</span> <span class="va">area</span><span class="op">)</span></span>
-<span><span class="va">kyst</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Kystkontur"</span>, series <span class="op">=</span> <span class="va">series</span>, area <span class="op">=</span> <span class="va">area</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">hav</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Havflate"</span>, series <span class="op">=</span> <span class="va">series</span>, area <span class="op">=</span> <span class="va">area_name</span><span class="op">)</span></span>
+<span><span class="va">innsjoer</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Innsjø"</span>, series <span class="op">=</span> <span class="va">series</span>, area <span class="op">=</span> <span class="va">area_name</span><span class="op">)</span></span>
+<span><span class="va">kyst</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/n_layers.html">n_get</a></span><span class="op">(</span><span class="st">"Kystkontur"</span>, series <span class="op">=</span> <span class="va">series</span>, area <span class="op">=</span> <span class="va">area_name</span><span class="op">)</span></span></code></pre></div>
 <p>Dette er flere lag fra samme arkiv, så filene kan gjenbrukes fra
 cache. Selve innlesingen av hvert nytt lag tar fortsatt tid.</p>
 <p><strong>Rekkefølgen på lagene betyr noe:</strong> Det siste laget

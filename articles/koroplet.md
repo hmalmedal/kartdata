@@ -112,12 +112,13 @@ oversiktskart. For mer detaljerte kart kan du velge en annen serie.
 ``` r
 
 series <- "N2000"
-area <- "Troms"
+area_name <- "Troms"
 
 omrader <- n_areas(series)
-subset(omrader, name == area)
-#> [1] area   name   epsg   format
-#> <0 rows> (or 0-length row.names)
+subset(omrader, name == area_name)
+#>    area  name  epsg format
+#> 55   55 Troms 25833   FGDB
+#> 56   55 Troms 25833    GML
 ```
 
 [`n_areas()`](https://hmalmedal.github.io/kartdata/reference/n_areas.md)
@@ -128,11 +129,11 @@ trenger selve arkivet og kan derfor utløse nedlasting.
 
 ``` r
 
-lag <- n_layers(series = series, area = area)
+lag <- n_layers(series = series, area = area_name)
 "Kommune" %in% lag
 #> [1] TRUE
 
-kommuner <- n_get("Kommune", series = series, area = area)
+kommuner <- n_get("Kommune", series = series, area = area_name)
 names(kommuner)
 #> [1] "objtype"          "navn"             "oppdateringsdato" "kommunenummer"   
 #> [5] "SHAPE_Length"     "SHAPE_Area"       "SHAPE"
@@ -344,9 +345,9 @@ derfor vannflater over kommunefargene og tegner kystlinjen øverst.
 
 ``` r
 
-hav <- n_get("Havflate", series = series, area = area)
-innsjoer <- n_get("Innsjø", series = series, area = area)
-kyst <- n_get("Kystkontur", series = series, area = area)
+hav <- n_get("Havflate", series = series, area = area_name)
+innsjoer <- n_get("Innsjø", series = series, area = area_name)
+kyst <- n_get("Kystkontur", series = series, area = area_name)
 ```
 
 Dette er flere lag fra samme arkiv, så filene kan gjenbrukes fra cache.
