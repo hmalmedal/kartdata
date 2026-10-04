@@ -14,6 +14,8 @@ navbar:
     articles:
       text: Veiledninger
       menu:
+      - text: Koroplet – fra prosenttabell til kommunekart
+        href: articles/koroplet.html
       - text: Cache, oppdatering og ytelse
         href: articles/cache.html
       - text: Forstå kartdataene
@@ -27,3 +29,4 @@ articles:
   - kartdata
   - cache
   - data-og-formater
+  - articles/koroplet
