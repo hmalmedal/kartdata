@@ -64,7 +64,7 @@
       <h1>Koroplet: fra prosenttabell til kommunekart</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/hmalmedal/kartdata/blob/v0.1.0/vignettes/articles/koroplet.Rmd" class="external-link"><code>vignettes/articles/koroplet.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hmalmedal/kartdata/blob/master/vignettes/articles/koroplet.Rmd" class="external-link"><code>vignettes/articles/koroplet.Rmd</code></a></small>
       <div class="d-none name"><code>koroplet.Rmd</code></div>
     </div>
 
@@ -91,14 +91,6 @@ skrive eksempeldataene som en liten tabell.</p>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hmalmedal/kartdata" class="external-link">kartdata</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     filter, lag</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -112,7 +104,8 @@ tabell 12943</a>: velg kommunene i Troms, statistikkvariabelen
 <strong>Andel bosatte i tettsted (prosent)</strong> og året
 <strong>2025</strong>. Tabellen nedenfor gjengir disse prosentverdiene.
 Vi skriver dem direkte i koden for å konsentrere oss om koblingen til
-kartet.</p>
+kartet. I en automatisert analyse kan samme tabell hentes direkte fra
+SSBs <a href="https://www.ssb.no/api/pxwebapi" class="external-link">API</a>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">prosentdata</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
 <span>                                   <span class="op">~</span><span class="va">kommune</span>, <span class="op">~</span><span class="va">andel_tettsted</span>,</span>
@@ -193,60 +186,10 @@ nedlasting.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">kommuner</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "objtype"          "navn"             "oppdateringsdato" "kommunenummer"   </span></span>
 <span><span class="co">#&gt; [5] "SHAPE_Length"     "SHAPE_Area"       "SHAPE"</span></span>
-<span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">kommuner</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Coordinate Reference System:</span></span>
-<span><span class="co">#&gt;   User input: ETRS89 / UTM zone 33N </span></span>
-<span><span class="co">#&gt;   wkt:</span></span>
-<span><span class="co">#&gt; PROJCRS["ETRS89 / UTM zone 33N",</span></span>
-<span><span class="co">#&gt;     BASEGEOGCRS["ETRS89",</span></span>
-<span><span class="co">#&gt;         ENSEMBLE["European Terrestrial Reference System 1989 ensemble",</span></span>
-<span><span class="co">#&gt;             MEMBER["European Terrestrial Reference Frame 1989"],</span></span>
-<span><span class="co">#&gt;             MEMBER["European Terrestrial Reference Frame 1990"],</span></span>
-<span><span class="co">#&gt;             MEMBER["European Terrestrial Reference Frame 1991"],</span></span>
-<span><span class="co">#&gt;             MEMBER["European Terrestrial Reference Frame 1992"],</span></span>
-<span><span class="co">#&gt;             MEMBER["European Terrestrial Reference Frame 1993"],</span></span>
-<span><span class="co">#&gt;             MEMBER["European Terrestrial Reference Frame 1994"],</span></span>
-<span><span class="co">#&gt;             MEMBER["European Terrestrial Reference Frame 1996"],</span></span>
-<span><span class="co">#&gt;             MEMBER["European Terrestrial Reference Frame 1997"],</span></span>
-<span><span class="co">#&gt;             MEMBER["European Terrestrial Reference Frame 2000"],</span></span>
-<span><span class="co">#&gt;             MEMBER["European Terrestrial Reference Frame 2005"],</span></span>
-<span><span class="co">#&gt;             MEMBER["European Terrestrial Reference Frame 2014"],</span></span>
-<span><span class="co">#&gt;             ELLIPSOID["GRS 1980",6378137,298.257222101,</span></span>
-<span><span class="co">#&gt;                 LENGTHUNIT["metre",1]],</span></span>
-<span><span class="co">#&gt;             ENSEMBLEACCURACY[0.1]],</span></span>
-<span><span class="co">#&gt;         PRIMEM["Greenwich",0,</span></span>
-<span><span class="co">#&gt;             ANGLEUNIT["degree",0.0174532925199433]],</span></span>
-<span><span class="co">#&gt;         ID["EPSG",4258]],</span></span>
-<span><span class="co">#&gt;     CONVERSION["UTM zone 33N",</span></span>
-<span><span class="co">#&gt;         METHOD["Transverse Mercator",</span></span>
-<span><span class="co">#&gt;             ID["EPSG",9807]],</span></span>
-<span><span class="co">#&gt;         PARAMETER["Latitude of natural origin",0,</span></span>
-<span><span class="co">#&gt;             ANGLEUNIT["degree",0.0174532925199433],</span></span>
-<span><span class="co">#&gt;             ID["EPSG",8801]],</span></span>
-<span><span class="co">#&gt;         PARAMETER["Longitude of natural origin",15,</span></span>
-<span><span class="co">#&gt;             ANGLEUNIT["degree",0.0174532925199433],</span></span>
-<span><span class="co">#&gt;             ID["EPSG",8802]],</span></span>
-<span><span class="co">#&gt;         PARAMETER["Scale factor at natural origin",0.9996,</span></span>
-<span><span class="co">#&gt;             SCALEUNIT["unity",1],</span></span>
-<span><span class="co">#&gt;             ID["EPSG",8805]],</span></span>
-<span><span class="co">#&gt;         PARAMETER["False easting",500000,</span></span>
-<span><span class="co">#&gt;             LENGTHUNIT["metre",1],</span></span>
-<span><span class="co">#&gt;             ID["EPSG",8806]],</span></span>
-<span><span class="co">#&gt;         PARAMETER["False northing",0,</span></span>
-<span><span class="co">#&gt;             LENGTHUNIT["metre",1],</span></span>
-<span><span class="co">#&gt;             ID["EPSG",8807]]],</span></span>
-<span><span class="co">#&gt;     CS[Cartesian,2],</span></span>
-<span><span class="co">#&gt;         AXIS["(E)",east,</span></span>
-<span><span class="co">#&gt;             ORDER[1],</span></span>
-<span><span class="co">#&gt;             LENGTHUNIT["metre",1]],</span></span>
-<span><span class="co">#&gt;         AXIS["(N)",north,</span></span>
-<span><span class="co">#&gt;             ORDER[2],</span></span>
-<span><span class="co">#&gt;             LENGTHUNIT["metre",1]],</span></span>
-<span><span class="co">#&gt;     USAGE[</span></span>
-<span><span class="co">#&gt;         SCOPE["Engineering survey, topographic mapping."],</span></span>
-<span><span class="co">#&gt;         AREA["Europe between 12°E and 18°E: Austria; Denmark - offshore and offshore; Germany - onshore and offshore; Norway including Svalbard - onshore and offshore."],</span></span>
-<span><span class="co">#&gt;         BBOX[46.4,12,84.42,18.01]],</span></span>
-<span><span class="co">#&gt;     ID["EPSG",25833]]</span></span>
+<span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">kommuner</span><span class="op">)</span><span class="op">$</span><span class="va">input</span></span>
+<span><span class="co">#&gt; [1] "ETRS89 / UTM zone 33N"</span></span>
+<span><span class="fu">sf</span><span class="fu">::</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_crs.html" class="external-link">st_crs</a></span><span class="op">(</span><span class="va">kommuner</span><span class="op">)</span><span class="op">$</span><span class="va">epsg</span></span>
+<span><span class="co">#&gt; [1] 25833</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/stopifnot.html" class="external-link">stopifnot</a></span><span class="op">(</span><span class="st">"kommunenummer"</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">kommuner</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">kommuner</span> <span class="op">&lt;-</span> <span class="va">kommuner</span> <span class="op">|&gt;</span></span>
@@ -361,7 +304,7 @@ på grensene, står utenfor <code><a href="https://ggplot2.tidyverse.org/referen
 <span>    subtitle <span class="op">=</span> <span class="st">"2025 · prosent av kommunens innbyggere"</span>,</span>
 <span>    caption <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="st">"Statistikk: SSB, tabell 12943 (2025)."</span>,</span>
 <span>                    <span class="st">"Kartdata: © Kartverket (CC BY 4.0)."</span>,</span>
-<span>                    <span class="st">"Bearbeidet med R-pakken `kartdata`. Grått = manglende verdi."</span>,</span>
+<span>                    <span class="st">"Bearbeidet med R-pakken kartdata. Grått = manglende verdi."</span>,</span>
 <span>                    sep <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
 <span></span>

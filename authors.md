@@ -7,7 +7,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/hmalmedal/kartdata/blob/v0.1.0/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/hmalmedal/kartdata/blob/master/DESCRIPTION)
 
 Malmedal H (2026). *kartdata: Client for Norwegian Mapping Authority
 Topographic Data*. R package version 0.1.0,

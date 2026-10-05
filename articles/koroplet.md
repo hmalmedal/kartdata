@@ -23,14 +23,6 @@ skrive eksempeldataene som en liten tabell.
 
 library(kartdata)
 library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 library(ggplot2)
 ```
 
@@ -44,7 +36,9 @@ Tallene er fra [SSB, tabell
 12943](https://www.ssb.no/statbank/table/12943): velg kommunene i Troms,
 statistikkvariabelen **Andel bosatte i tettsted (prosent)** og året
 **2025**. Tabellen nedenfor gjengir disse prosentverdiene. Vi skriver
-dem direkte i koden for å konsentrere oss om koblingen til kartet.
+dem direkte i koden for å konsentrere oss om koblingen til kartet. I en
+automatisert analyse kan samme tabell hentes direkte fra SSBs
+[API](https://www.ssb.no/api/pxwebapi).
 
 ``` r
 
@@ -137,60 +131,10 @@ kommuner <- n_get("Kommune", series = series, area = area_name)
 names(kommuner)
 #> [1] "objtype"          "navn"             "oppdateringsdato" "kommunenummer"   
 #> [5] "SHAPE_Length"     "SHAPE_Area"       "SHAPE"
-sf::st_crs(kommuner)
-#> Coordinate Reference System:
-#>   User input: ETRS89 / UTM zone 33N 
-#>   wkt:
-#> PROJCRS["ETRS89 / UTM zone 33N",
-#>     BASEGEOGCRS["ETRS89",
-#>         ENSEMBLE["European Terrestrial Reference System 1989 ensemble",
-#>             MEMBER["European Terrestrial Reference Frame 1989"],
-#>             MEMBER["European Terrestrial Reference Frame 1990"],
-#>             MEMBER["European Terrestrial Reference Frame 1991"],
-#>             MEMBER["European Terrestrial Reference Frame 1992"],
-#>             MEMBER["European Terrestrial Reference Frame 1993"],
-#>             MEMBER["European Terrestrial Reference Frame 1994"],
-#>             MEMBER["European Terrestrial Reference Frame 1996"],
-#>             MEMBER["European Terrestrial Reference Frame 1997"],
-#>             MEMBER["European Terrestrial Reference Frame 2000"],
-#>             MEMBER["European Terrestrial Reference Frame 2005"],
-#>             MEMBER["European Terrestrial Reference Frame 2014"],
-#>             ELLIPSOID["GRS 1980",6378137,298.257222101,
-#>                 LENGTHUNIT["metre",1]],
-#>             ENSEMBLEACCURACY[0.1]],
-#>         PRIMEM["Greenwich",0,
-#>             ANGLEUNIT["degree",0.0174532925199433]],
-#>         ID["EPSG",4258]],
-#>     CONVERSION["UTM zone 33N",
-#>         METHOD["Transverse Mercator",
-#>             ID["EPSG",9807]],
-#>         PARAMETER["Latitude of natural origin",0,
-#>             ANGLEUNIT["degree",0.0174532925199433],
-#>             ID["EPSG",8801]],
-#>         PARAMETER["Longitude of natural origin",15,
-#>             ANGLEUNIT["degree",0.0174532925199433],
-#>             ID["EPSG",8802]],
-#>         PARAMETER["Scale factor at natural origin",0.9996,
-#>             SCALEUNIT["unity",1],
-#>             ID["EPSG",8805]],
-#>         PARAMETER["False easting",500000,
-#>             LENGTHUNIT["metre",1],
-#>             ID["EPSG",8806]],
-#>         PARAMETER["False northing",0,
-#>             LENGTHUNIT["metre",1],
-#>             ID["EPSG",8807]]],
-#>     CS[Cartesian,2],
-#>         AXIS["(E)",east,
-#>             ORDER[1],
-#>             LENGTHUNIT["metre",1]],
-#>         AXIS["(N)",north,
-#>             ORDER[2],
-#>             LENGTHUNIT["metre",1]],
-#>     USAGE[
-#>         SCOPE["Engineering survey, topographic mapping."],
-#>         AREA["Europe between 12°E and 18°E: Austria; Denmark - offshore and offshore; Germany - onshore and offshore; Norway including Svalbard - onshore and offshore."],
-#>         BBOX[46.4,12,84.42,18.01]],
-#>     ID["EPSG",25833]]
+sf::st_crs(kommuner)$input
+#> [1] "ETRS89 / UTM zone 33N"
+sf::st_crs(kommuner)$epsg
+#> [1] 25833
 
 stopifnot("kommunenummer" %in% names(kommuner))
 kommuner <- kommuner |>
@@ -317,7 +261,7 @@ enkelt_kart <- ggplot(prosentkartdata) +
     subtitle = "2025 · prosent av kommunens innbyggere",
     caption = paste("Statistikk: SSB, tabell 12943 (2025).",
                     "Kartdata: © Kartverket (CC BY 4.0).",
-                    "Bearbeidet med R-pakken `kartdata`. Grått = manglende verdi.",
+                    "Bearbeidet med R-pakken kartdata. Grått = manglende verdi.",
                     sep = "\n")
   )
 
