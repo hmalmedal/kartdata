@@ -27,7 +27,7 @@ Vi bruker `kartdata` til å hente kart, `dplyr` til å koble tabeller og
 `ggplot2` til å tegne. `sf` håndterer geometri, og `tibble` brukes til
 å skrive eksempeldataene som en liten tabell.
 
-```{r pakker}
+```{r pakker, message=FALSE}
 # Installer ved behov:
 # install.packages(c("dplyr", "ggplot2", "tibble"))
 
@@ -45,6 +45,7 @@ Tallene er fra [SSB, tabell 12943](https://www.ssb.no/statbank/table/12943):
 velg kommunene i Troms, statistikkvariabelen **Andel bosatte i tettsted
 (prosent)** og året **2025**. Tabellen nedenfor gjengir disse prosentverdiene.
 Vi skriver dem direkte i koden for å konsentrere oss om koblingen til kartet.
+I en automatisert analyse kan samme tabell hentes direkte fra SSBs [API](https://www.ssb.no/api/pxwebapi).
 
 ```{r prosentdata}
 prosentdata <- tibble::tribble(
@@ -124,7 +125,8 @@ lag <- n_layers(series = series, area = area_name)
 
 kommuner <- n_get("Kommune", series = series, area = area_name)
 names(kommuner)
-sf::st_crs(kommuner)
+sf::st_crs(kommuner)$input
+sf::st_crs(kommuner)$epsg
 
 stopifnot("kommunenummer" %in% names(kommuner))
 kommuner <- kommuner |>
@@ -211,7 +213,7 @@ enkelt_kart <- ggplot(prosentkartdata) +
     subtitle = "2025 · prosent av kommunens innbyggere",
     caption = paste("Statistikk: SSB, tabell 12943 (2025).",
                     "Kartdata: © Kartverket (CC BY 4.0).",
-                    "Bearbeidet med R-pakken `kartdata`. Grått = manglende verdi.",
+                    "Bearbeidet med R-pakken kartdata. Grått = manglende verdi.",
                     sep = "\n")
   )
 
