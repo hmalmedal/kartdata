@@ -170,7 +170,8 @@ selv om bare ett lag materialiseres som sf.
 Automatiske tester bruker genererte små FGDB-/GML-filer, mockede HTTP-svar og
 midlertidig cache. Nettverkstest for alle sju produktfeeder og N1000-lesing er
 eksplisitt opt-in. Ingen N50-nedlasting skjer i vanlig testing. Full innlesing
-av alle serier er ikke verifisert, bare generisk kode, alle feedoppslag og N1000
+av alle serier er ikke verifisert. Generisk kode, alle feedoppslag, N1000-lesing
+og alle publiserte objekttyper på Utsira i N50, N100 og N250 er kontrollert
 med begge formater. Kartdata ligger utenfor Git; pakkeversjonen følger kode,
 mens cachemetadata følger dataversjonen.
 
@@ -209,6 +210,22 @@ testthat::test_local(filter = "integration")
 # Frivillig: N1000-nedlasting til standard brukercache
 Sys.setenv(KARTDATA_DOWNLOAD_TEST = "true")
 testthat::test_local(filter = "integration")
+
+# Frivillig: små Utsira-arkiver for N50, N100 og N250, FGDB og GML
+Sys.setenv(KARTDATA_UTSIRA_TEST = "true")
+testthat::test_local(filter = "integration-utsira")
+Sys.unsetenv("KARTDATA_UTSIRA_TEST")
 ```
 
 Vanlig `R CMD check` laster ikke ned kartdata eller kontakter Geonorge.
+
+Utsira-testen bruker en egen midlertidig cache som ryddes etter hvert tilfelle,
+og endrer ikke brukerens kartcache. De seks arkivene i EPSG:25833 var samlet
+under 1 MB ved kontroll 27. oktober 2026. Alle publiserte objekttyper leses;
+tvetydige navn prøves via de fysiske lagene feilmeldingen viser. N50 har for
+eksempel Bygning både som punkt og flate. Testen kontrollerer sf-returverdi,
+ikke-tomme geometrier, koordinatsystem og punkt-/linje-/flategeometri uten å
+låse antall objekter. HTTP blokkeres etter nedlasting, og en teller for faktisk
+innlesing skiller minnecachetreff fra ny lesing av diskcache. Manglende lokal
+GDAL-driver gir en eksplisitt hoppet-over-test for det aktuelle formatet.
+Utsira dekker ikke store arkiver eller objekttyper som ikke finnes på øya.
